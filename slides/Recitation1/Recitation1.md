@@ -346,7 +346,7 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 - 如何实现的切换环境？
 - 演示：
   - 终端打开文件夹，查看 `PATH`、寻找 `python` 位置
-  - 手动激活环境：`source .venv/bin/activate`(macOS/Linux) / `.\.venv\bin\activate.ps1`
+  - 手动激活环境：`source .venv/bin/activate`(macOS/Linux) / `.\.venv\bin\activate.ps1`(Windows)
   - 再次查看 `PATH`、寻找 `python` 位置
 - 可见，他通过修改了环境变量来实现运行不同的 Python <!-- .element: class="fragment" -->
 - （实际上还有一些变化，这里不再赘述，感兴趣的同学可以自行探索，期待你在 Piazza 上面发贴展示你的探索结果！）<!-- .element: class="fragment" -->
@@ -564,7 +564,7 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 - 一些程序不一定能直接执行，但包含许多可被其他程序重复使用的代码
   - 称为**库 （Library）**
   - 可能是文本形式的代码（如 Python module），也可能是二进制的机器码（如 C++ 的动态链接库）
-  - Python 中，打包好的库常以 Python 软件包的形式安装和使用
+  - Python 中，打包好的库常以 Python 软件包（package）的形式安装和使用
 
 <!--v-->
 
@@ -782,6 +782,21 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
   Please input s:100 # printed its argument first
   >>> type(s)
   <class 'str'> # type of input is always string
+  ```
+
+- 如何处理同时输入多个内容？---`split()`
+  - 通过指定分隔符对字符串进行切片，并返回分割后的字符串列表。
+  ```python-REPL
+  >>> a, b = input("Please input 'a;b': ").split(';')
+  Please input a and b: 100;200
+  ```
+
+- 如何将输入快速用于运算？---`map()`
+  ```python-REPL
+  >>> a, b = map(int, input("Please input 'a;b': ").split(';'))
+  Please input a and b: 100;200
+  >>> type(a)
+  <class 'int'> # The input type changed from string to integer
   ```
 
 <!--v-->
