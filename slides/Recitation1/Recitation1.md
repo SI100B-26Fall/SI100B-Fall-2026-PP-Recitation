@@ -359,9 +359,9 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 
 ## VS Code 打开文件夹
 
-- 在桌面或者其他地方新建一个文件夹，命名为 `SI100+`
-- 将 Piazza 上的本课的压缩包**完全解压**并移动到 `SI100+` 文件夹中
-- 打开 VS Code，在 VS Code 中点击顶部菜单栏的 File `->` Open Folder，打开刚刚新建的 `SI100+` 文件夹中的课程资料文件夹
+- 在桌面或者其他地方新建一个文件夹，命名为 `Recitation1` 或者其他你喜欢的名字
+- 将 Piazza 上的本课的压缩包**完全解压**并移动到 `Recitation1` 文件夹中
+- 打开 VS Code，在 VS Code 中点击顶部菜单栏的 File `->` Open Folder，打开刚刚新建的 `Recitation1` 文件夹
 - 打开 VS Code 自带的终端，输入 `uv sync` 并回车，根据文件夹自带的项目文件同步依赖和创建环境
 - 点击左侧边栏的 `.ipynb` 文件，即可打开文件
 - 选择 Kernel 里，找到我们的环境
@@ -371,7 +371,7 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 
 #### 到此，我们的环境配置初步完成。
 
-非常感谢 SI100+ 等先前课程同学提供的相关资料。
+非常感谢 SI100B、SI100+ 等先前课程同学提供的相关资料。
 
 <!--s-->
 
@@ -395,7 +395,7 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 
 不要让 ChatGPT 等 AI 大模型替你完成题目！
 
-- 不仅违反规定，还违背作业的目的：回顾和练习。
+- 不仅违反规定，也违背作业的目的：回顾和练习。
 
 <br>
 
