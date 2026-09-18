@@ -812,7 +812,7 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 - 基本：打印字符串
   - `print("Hello, world!")`
 - 多个参数将连接起来，默认在中间加空格：
-  - `print("x = ", x)` 输出 `x = 1.5`
+  - `print("x =", x)` 输出 `x = 1.5`
 - 前面提及的格式化字符串
   - `print(f"x = {x}")` 输出 `x = 1.5`
   - `print(f"x = {x:.2f}")` 输出 `x = 1.50`
