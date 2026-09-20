@@ -1,5 +1,5 @@
 ---
-title: SI100B_Fall_2026_Recitation_2+
+title: SI100B_Fall_2026_Recitation_2_Supplement
 separator: <!--s-->
 verticalSeparator: <!--v-->
 theme: simple
@@ -7,9 +7,9 @@ highlightTheme: github
 css: assets/custom.css
 autoTitlePage: true
 makeTitle:
-    lecture: SI100B Fall 2026 Recitation 2+
+    lecture: SI100B Fall 2026 Recitation 2 Supplement
     title: Lecture 1–3 正课知识体系复习
-    detail: SI100B 2026 Staff | B 班第 2 次习题课 | 2026-09-20
+    detail: SI100B 2026 Staff  | 2026-09-20
 makeThanks: true
 ---
 <style>
@@ -36,7 +36,7 @@ makeThanks: true
 
 每页的关键结论用加粗标出；标有「试一试」的页面，建议先自己动手再看答案。
 
-易错清单、动手练习与参考实现都在配套的 Notebook 里（Recitation2+.ipynb）。
+易错清单、动手练习与参考实现都在配套的 Notebook 里（Recitation2_Supplement.ipynb）。
 <!--v-->
 
 ## 学习路线图：从数据到算法
