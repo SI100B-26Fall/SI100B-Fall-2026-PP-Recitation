@@ -7,7 +7,7 @@ highlightTheme: github
 css: assets/custom.css
 autoTitlePage: true
 makeTitle:
-    lecture: SI100B Fall 2025 Recitation 2
+    lecture: SI100B Fall 2026 Recitation 2
     title: How to use OJ
     detail: SI100B 2026 Staff | 2026-09-20
 makeThanks: true
