@@ -91,6 +91,15 @@
 <img src="images/oj7.png" width="75%" style="float: middle;">
 
 <!--v-->
+## 参考操作流程
+
+- 给自己在合适的位置新建一个 `SI100B` 的目录，通过 `uv init` 来初始化项目。
+- 在目录下新建一个 `Homework0`，用 VS Code 打开这个目录。
+- 在目录下新建 `P1001.py` 并打开，在 VS Code 中编写代码，及时保存。
+- 通过 `uv run P1001.py` 运行 Python 脚本，输入样例检查输出结果。
+- 复制到 OJ 上进行提交。
+
+<!--v-->
 ## 作业评分和学术诚信提示
 - 学生在某道题目的得分**仅取决于学生在此题目上<u>最后一次提交的程序得分</u>**
 
@@ -129,13 +138,30 @@ Python 创建了一个官方的编码风格规范：[PEP 8](https://peps.python.
    - 对于普通变量，使用蛇形命名法，例如：max_value.
    - 对于常量，使用全大写字母，并使用下划线连接，例如：MAX_VALUE。
    - 对于仅供内部使用的变量，在其前面添加下划线前缀，例如：_local_var。
-   - 对于与Python 关键字冲突的变量名，在变量末尾添加下划线，例如：class_。
+   - 对于与 Python 关键字冲突的变量名，在变量末尾添加下划线，例如：class_。
+
+<!--v-->
+## 使用格式化工具：Ruff
+
+- [Ruff](https://docs.astral.sh/ruff/) 是一个快速的 Python 代码检查与格式化工具，可以自动统一缩进、空格和换行等代码风格。
+  - 在 Ruff 之前，Black 是最常用的格式化器，采用 PEP 8 原则的同时，制定了一套确定性的格式规则。
+  - Ruff 基本兼容 Black（格式化），Flake8（代码检查）和 isort（import排序）的功能。
+- 在工具中安装 Ruff，并格式化当前目录下的 Python 代码：
+
+```bash
+uv tool install ruff@latest
+ruff format .
+```
+
+- 只检查代码是否需要格式化，而不修改文件：`ruff format --check .`
+- VS Code 也可安装 Ruff 插件，通过“格式化文档”或“保存时格式化”自动整理代码。
+- 格式化工具只负责统一排版；清晰的命名、合理的注释仍需由程序员完成。
 
 <!--v-->
 ## 描述性的变量名
 - 代码大量使用描述性较弱的变量名，读者将很难理解代码的含义。例如
- <div style=" margin-top: 10px; margin-right: 20px; margin-left: 20px" markdown="1">
 
+<div style=" margin-top: 10px; margin-right: 20px; margin-left: 20px" markdown="1">
 | weakly descriptive | strong descriptive | 
 |:---:|:---:|
 | data | file_chunks | 
