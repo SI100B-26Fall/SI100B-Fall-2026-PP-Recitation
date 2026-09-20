@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>SI100B_Fall_2026_Recitation_2</title>
+  <link rel="shortcut icon" href="./favicon.ico" />
+  <link rel="stylesheet" href="./dist/reset.css" />
+  <link rel="stylesheet" href="./dist/reveal.css" />
+  <link rel="stylesheet" href="./dist/theme/simple.css" id="theme" />
+  <link rel="stylesheet" href="./css/highlight/github.css" />
+
+  <link rel="stylesheet" href="./_assets/assets/custom.css" />
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section data-markdown data-separator="<!--s-->" data-separator-vertical="<!--v-->">
+        <textarea data-template>
+            
+<p style="font-size: 16px; color: #999; margin:5px; position: absolute;"><a href="..">Homepage</a> | <a href="?print-pdf">Printable Version</a></p>
+<div style="display: flex; justify-content: center; align-items: center; height: 700px;">
+  <div style="text-align: center; padding: 40px; background-color: white; border: 2px solid rgb(0, 63, 163); border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+    <h1 style="font-size: 48px; font-weight: bold; margin-bottom: 20px; color: #333;">SI100B Fall 2025 Recitation 2</h1>
+    <p style="font-size: 24px; color: #666;">How to use OJ</p>
+    <p style="font-size: 16px; color: #999; margin-top: 20px; margin-bottom:5px">SI100B 2026 Staff | 2026-09-20</p>
+  </div>
+</div>
+
+<!--s-->
+
+
+
+
+<div class="middle center"><div style="width: 100%">
+
+# Homework & Online Judge
+
+</div></div>
+
+<!--v-->
+ ## Homework & Online Judge
+- Homework 1 下周三0点发布
+  - 截止日期 (Deadline) 10 月 6 日 21:00（另留有 15 分钟缓冲）
+  - **不允许迟交和截止后提交**；如有特殊情况，请单独联系老师并提供佐证材料
+
+- OJ 地址: [http://10.15.21.133/d/SI100B_2026_Autumn/](http://10.15.21.133/d/SI100B_2026_Autumn/)
+  - 该地址为学校内网，如想在校外访问，请先使用上科大 VPN 来访问学校内网（具体可在 egate 平台上查询）。
+
+- 账号：我们为每一位同学用学校邮箱提前注册了账号，如zhangsan2026@shanghaitech.edu.cn，用户名为zhangsan2026
+  - 首次使用时，请点击**忘记密码**，用自己的邮箱设置新密码
+
+<!--v-->
+
+## 找到作业
+
+<img src="images/oj1.png" width="70%" style="float: middle;">
+
+<!--v-->
+
+## 认领作业
+
+<img src="images/oj2.png" width="70%" style="float: middle;">
+
+<!--v-->
+## 打开题目
+
+<img src="images/oj3.png" width="75%" style="float: middle;">
+  
+<!--v-->
+## 点击递交
+
+<img src="images/oj4.png" width="75%" style="float: middle;">
+
+<!--v-->
+## 选择提交方式
+
+<img src="images/oj5.png" width="75%" style="float: middle;">
+
+<!--v-->
+## 等待结果
+
+<img src="images/oj6.png" width="75%" style="float: middle;">
+
+<!--v-->
+## 查看成绩
+
+<img src="images/oj7.png" width="75%" style="float: middle;">
+
+<!--v-->
+## 作业评分和学术诚信提示
+- 学生在某道题目的得分**仅取决于学生在此题目上<u>最后一次提交的程序得分</u>**
+
+- 实际作业分数为：在当次作业**截止时间前**，在 OJ 系统上**提交并评测完成后**显示的作业分数
+  - 注：不接受任何除 OJ 系统之外的作业提交
+
+- 对作业中**所有**提交过的程序查重，不仅仅是每道题目的最后一次提交
+
+- 禁止使用 AI 工具生成作业代码
+
+- 保护好自己的代码！
+  - 无法界定谁抄袭和谁被抄袭，涉及的双方均会受到同等惩罚
+
+<!--s-->
+<div class="middle center"><div style="width: 100%">
+
+# Coding Style
+
+</div></div>
+<!--v-->
+## 为什么要有良好的代码风格？
+> There are only two hard things in Computer Science: cache invalidation and naming things.
+>
+>  ---Phil Karlton
+- 方便自己检查 bug
+- 方便合作者阅读代码
+- 阅读/写出赏心悦目的代码能让人心情愉悦
+
+<!--v-->
+## 遵循 PEP 8 规范
+Python 创建了一个官方的编码风格规范：[PEP 8](https://peps.python.org/pep-0008/)，以保持不同开发者编写的代码风格的一致性。
+
+1. 使用4个空格进行缩进。
+2. 每行不超过79个字符。
+3. 变量命名约定：
+   - 对于普通变量，使用蛇形命名法，例如：max_value.
+   - 对于常量，使用全大写字母，并使用下划线连接，例如：MAX_VALUE。
+   - 对于仅供内部使用的变量，在其前面添加下划线前缀，例如：_local_var。
+   - 对于与Python 关键字冲突的变量名，在变量末尾添加下划线，例如：class_。
+
+<!--v-->
+## 描述性的变量名
+- 代码大量使用描述性较弱的变量名，读者将很难理解代码的含义。例如
+ <div style=" margin-top: 10px; margin-right: 20px; margin-left: 20px" markdown="1">
+
+| weakly descriptive | strong descriptive | 
+|:---:|:---:|
+| data | file_chunks | 
+| temp | pending_id | 
+| result | active_menber | 
+</div> 
+
+- 一些特殊情况：
+  - 数组索引 `i,j,k`
+  - 一些整数 `n`
+  - 一个临时字符串 `s`
+  - 一个异常 `e`
+  - 文件对象 `fp`
+
+<!--v-->
+## 两种最常见的命名规范
+- 驼峰命名法（Camel Case）：第一个单词首字母小写，其余单词首字母答谢，此法常用于方法名:
+  - firstName
+  - findLocation
+- 下划线命名法（Snake Case）：所有单词用下划线连接。
+  - first_name
+  - find_location
+
+<!--v-->
+## 善用空格
+- 肉眼可利用空格快速区分代码的不同部分
+- 在二元运算符（如`+`、`-`、`==`、`>` 和`=`）前后使用空格，明确区分运算符和操作数。例如：`1 + 1`，`ans += 1`
+- 在 “,” 后使用空格。例如：`func(a, b, c)`
+
+<!--v-->
+## 缩进
+- 可以选择使用 4 个空格（PEP8 规范）、2个空格（Google style）或 1个 tab 作为缩进方式。
+- 必须在所有代码中保持相同的缩进方式
+<img src="images/indentation_method.png" width="75%" style="float: middle;">
+
+
+<!--v-->
+## 减少无意义注释（Comment）
+- 没有编译器或者解释器的相助，编写和维护注释需要更多的时间成本
+- 试图通过更好的命名替代注释
+```python
+# HTTP response code indicates can't find the requested resource 
+if stauts_code == 404:
+  ...
+```
+```python
+HTTP_NOT_FOUND = 404 
+if stauts_code == HTTP_NOT_FOUND:
+  ...
+```
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# 答疑时间
+
+</div></div>
+
+<!--s-->
+
+<div style="display: flex; justify-content: center; align-items: center; height: 700px;   ">
+  <div style="text-align: center; padding: 40px; background-color: white; border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+    <div style="display: inline-block; padding: 20px 40px; border-radius: 10 px; margin-bottom: 20px;">
+      <h1 style="font-size: 48px; font-weight: bold; margin: 0; color: rgb(16, 33, 89)">Thanks for Listening</h1>
+    </div>
+    <p style="font-size: 24px; color: #666; margin: 0;">Any questions?</p>
+  </div>
+</div>
+          </textarea>
+      </section>
+    </div>
+  </div>
+
+  <script src="./dist/reveal.js"></script>
+
+  <script src="./mermaid/dist/mermaid.min.js"></script>
+
+  <script src="./plugin/markdown/markdown.js"></script>
+  <script src="./plugin/highlight/highlight.js"></script>
+  <script src="./plugin/zoom/zoom.js"></script>
+  <script src="./plugin/notes/notes.js"></script>
+  <script src="./plugin/math/math.js"></script>
+  <!-- Font awesome is required for the chalkboard plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom controls plugin is used to for opening and closing annotation modes. -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/customcontrols/plugin.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/customcontrols/style.css">
+  <!-- Chalkboard plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+  <script>
+    function extend() {
+      var target = {};
+      for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+          if (source.hasOwnProperty(key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+      return target;
+    }
+
+    // default options to init reveal.js
+    var defaultOptions = {
+      controls: true,
+      progress: true,
+      history: true,
+      center: false,
+      width: 1000,
+      pdfSeparateFragments: false,
+      transition: 'slide',
+      transitionSpeed: 'fast',
+      slideNumber: "c/t",
+      highlight: {
+        highlightOnLoad: false
+      },
+      plugins: [
+        RevealMarkdown,
+        RevealHighlight,
+        RevealZoom,
+        RevealNotes,
+        RevealMath.KaTeX,
+        RevealChalkboard,
+        RevealCustomControls,
+      ],
+      customcontrols: {
+        controls: [
+          {
+            icon: '<i class="fa fa-pen-square"></i>',
+            title: 'Toggle chalkboard (B)',
+            action: 'RevealChalkboard.toggleChalkboard();'
+          },
+          {
+            icon: '<i class="fa fa-pen"></i>',
+            title: 'Toggle notes canvas (C)',
+            action: 'RevealChalkboard.toggleNotesCanvas();'
+          }
+        ]
+      },
+      chalkboard: {
+        // add configuration here
+      },
+    };
+
+    // options from URL query string
+    var queryOptions = Reveal().getQueryHash() || {};
+
+    var options = extend(defaultOptions, {"_":["slides/Recitation2/Recitation2.md"],"static":"static/Recitation2","template":"./assets/reveal.html","preprocessor":"./assets/preproc.js","scripts":"assets/menu/menu.js,assets/inject.js"}, queryOptions);
+  </script>
+
+  <script src="./_assets/assets/menu/menu.js"></script>
+  <script src="./_assets/assets/inject.js"></script>
+
+  <script>
+    Reveal.initialize(options);
+    Reveal.addEventListener('ready', function (event) {
+      const blocks = Reveal.getRevealElement().querySelectorAll('pre code:not(.mermaid)');
+      const hlp = Reveal.getPlugin('highlight');
+      blocks.forEach(hlp.highlightBlock);
+    });
+  </script>
+
+  <script>
+    const mermaidOptions = extend({ startOnLoad: false }, {});
+    mermaid.startOnLoad = false;
+    mermaid.initialize(mermaidOptions);
+    const cb = function (event) {
+      mermaid.init(mermaidOptions, '.stack.present > .present pre code.mermaid');
+      mermaid.init(mermaidOptions, '.slides > .present:not(.stack) pre code.mermaid');
+    }
+    Reveal.addEventListener('ready', cb);
+    Reveal.addEventListener('slidetransitionend', cb);
+  </script>
+</body>
+
+</html>
