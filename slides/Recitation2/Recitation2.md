@@ -38,8 +38,6 @@ makeThanks: true
 
 ## 认领作业
 
-- 直接提交代码
-
 <img src="images/oj2.png" width="70%" style="float: middle;">
 
 <!--v-->
