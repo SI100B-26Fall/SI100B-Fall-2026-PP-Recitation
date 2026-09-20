@@ -115,6 +115,8 @@ Python 创建了一个官方的编码风格规范：[PEP 8](https://peps.python.
 ## 使用格式化工具：Ruff
 
 - [Ruff](https://docs.astral.sh/ruff/) 是一个快速的 Python 代码检查与格式化工具，可以自动统一缩进、空格和换行等代码风格。
+  - 在 Ruff 之前，Black 是最常用的格式化器，采用 PEP 8 原则的同时，制定了一套确定性的格式规则。
+  - Ruff 基本兼容 Black（格式化），Flake8（代码检查）和 isort（import排序）的功能。
 - 在工具中安装 Ruff，并格式化当前目录下的 Python 代码：
 
 ```bash
@@ -129,8 +131,8 @@ ruff format .
 <!--v-->
 ## 描述性的变量名
 - 代码大量使用描述性较弱的变量名，读者将很难理解代码的含义。例如
- <div style=" margin-top: 10px; margin-right: 20px; margin-left: 20px" markdown="1">
 
+<div style=" margin-top: 10px; margin-right: 20px; margin-left: 20px" markdown="1">
 | weakly descriptive | strong descriptive | 
 |:---:|:---:|
 | data | file_chunks | 
