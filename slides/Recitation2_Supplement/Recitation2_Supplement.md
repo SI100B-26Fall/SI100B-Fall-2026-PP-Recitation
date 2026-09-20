@@ -7,7 +7,7 @@ highlightTheme: github
 css: assets/custom.css
 autoTitlePage: true
 makeTitle:
-    lecture: SI100B Fall 2026 Recitation 2 Supplement
+    lecture: SI100B Fall 2026 Recitation 2+
     title: Lecture 1–3 正课知识体系复习
     detail: SI100B 2026 Staff  | 2026-09-20
 makeThanks: true
