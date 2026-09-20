@@ -1,0 +1,1845 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>SI100B_Fall_2026_Recitation_2+</title>
+  <link rel="shortcut icon" href="./favicon.ico" />
+  <link rel="stylesheet" href="./dist/reset.css" />
+  <link rel="stylesheet" href="./dist/reveal.css" />
+  <link rel="stylesheet" href="./dist/theme/simple.css" id="theme" />
+  <link rel="stylesheet" href="./css/highlight/github.css" />
+
+  <link rel="stylesheet" href="./_assets/assets/custom.css" />
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section data-markdown data-separator="<!--s-->" data-separator-vertical="<!--v-->">
+        <textarea data-template>
+            
+<p style="font-size: 16px; color: #999; margin:5px; position: absolute;"><a href="..">Homepage</a> | <a href="?print-pdf">Printable Version</a></p>
+<div style="display: flex; justify-content: center; align-items: center; height: 700px;">
+  <div style="text-align: center; padding: 40px; background-color: white; border: 2px solid rgb(0, 63, 163); border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+    <h1 style="font-size: 48px; font-weight: bold; margin-bottom: 20px; color: #333;">SI100B Fall 2026 Recitation 2+</h1>
+    <p style="font-size: 24px; color: #666;">Lecture 1–3 正课知识体系复习</p>
+    <p style="font-size: 16px; color: #999; margin-top: 20px; margin-bottom:5px">SI100B 2026 Staff | B 班第 2 次习题课 | 2026-09-20</p>
+  </div>
+</div>
+
+<!--s-->
+
+
+<style>
+  .reveal h1 code,
+  .reveal h2 code,
+  .reveal h3 code,
+  .reveal h4 code {
+    font-size: 0.78em;
+    padding: 0 4px;
+  }
+</style>
+
+<div class="middle center"><div style="width: 100%">
+
+# How to Use These Slides
+
+</div></div>
+
+<!--v-->
+
+## 这节课要做什么
+
+本讲把 Lecture 1 – 3 的内容按依赖关系串起来，方便对照复习。
+
+- 每个知识点都按三步展开：为什么需要它、语法怎么写、容易错在哪
+- 重点是能看懂代码的执行过程（trace）
+  - 能一行一行说出"此刻变量里是什么值"，程序就真正写明白了
+
+每页的关键结论用加粗标出；标有「试一试」的页面，建议先自己动手再看答案。
+
+易错清单、动手练习与参考实现都在配套的 Notebook 里（Recitation2+.ipynb）。
+<!--v-->
+
+## 学习路线图：从数据到算法
+
+<svg viewBox="0 0 920 310" width="96%" style="display:block;margin:6px auto;">
+  <defs>
+    <marker id="arwHead" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#666"/></marker>
+  </defs>
+  <rect x="10" y="10" width="900" height="80" rx="6" fill="#f6f8fb" stroke="#003fa3" stroke-width="1.5"/>
+  <text x="32" y="56" font-size="17" fill="#003fa3" font-weight="bold">数据</text>
+  <rect x="140" y="30" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="228" y="56" text-anchor="middle" font-size="16" fill="#222">对象与类型</text>
+  <rect x="328" y="30" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="416" y="56" text-anchor="middle" font-size="16" fill="#222">表达式与变量</text>
+  <rect x="516" y="30" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="604" y="56" text-anchor="middle" font-size="16" fill="#222">字符串与切片</text>
+  <rect x="704" y="30" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="792" y="56" text-anchor="middle" font-size="16" fill="#222">输入输出与 f-string</text>
+  <line x1="460" y1="92" x2="460" y2="116" stroke="#666" stroke-width="1.5" marker-end="url(#arwHead)"/>
+  <rect x="10" y="120" width="900" height="80" rx="6" fill="#f6f8fb" stroke="#003fa3" stroke-width="1.5"/>
+  <text x="32" y="166" font-size="17" fill="#003fa3" font-weight="bold">控制</text>
+  <rect x="140" y="140" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="228" y="166" text-anchor="middle" font-size="16" fill="#222">bool 与比较</text>
+  <rect x="328" y="140" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="416" y="166" text-anchor="middle" font-size="16" fill="#222">if / elif / else</text>
+  <rect x="516" y="140" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="604" y="166" text-anchor="middle" font-size="16" fill="#222">while 循环</text>
+  <rect x="704" y="140" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="792" y="166" text-anchor="middle" font-size="16" fill="#222">for / range / break</text>
+  <line x1="460" y1="202" x2="460" y2="226" stroke="#666" stroke-width="1.5" marker-end="url(#arwHead)"/>
+  <rect x="10" y="230" width="900" height="80" rx="6" fill="#f6f8fb" stroke="#003fa3" stroke-width="1.5"/>
+  <text x="32" y="276" font-size="17" fill="#003fa3" font-weight="bold">算法</text>
+  <rect x="140" y="250" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="228" y="276" text-anchor="middle" font-size="16" fill="#222">猜-检查</text>
+  <rect x="328" y="250" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="416" y="276" text-anchor="middle" font-size="16" fill="#222">布尔标志</text>
+  <rect x="516" y="250" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="604" y="276" text-anchor="middle" font-size="16" fill="#222">嵌套循环与效率</text>
+  <rect x="704" y="250" width="176" height="40" rx="4" fill="#ffffff" stroke="#9aa7bd"/>
+  <text x="792" y="276" text-anchor="middle" font-size="16" fill="#222">二进制与浮点数</text>
+</svg>
+
+<!--v-->
+
+## 三条贯穿全课的主线
+
+<strong>计算机只会做两件事</strong>：执行简单操作 + 记住结果。所有复杂功能都是这两件事的组合。
+
+<strong>判断 + 重复就能写出算法</strong>：`if` 决定走哪条路，`while` / `for` 决定重复多少遍。这两样组合起来，就能实现课上见到的所有算法。
+
+<strong>不确定就跑一遍</strong>：拿不准某段代码的结果时，直接在 console 里敲一遍。写代码时坚持写一点、测一点（Debug early, debug often），不要一口气写完整个程序。
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Computation, Algorithms and Language
+
+</div></div>
+
+<!--v-->
+
+## 算法的三个条件
+
+一段步骤要成为<strong>算法（algorithm）</strong>，必须同时满足：<strong>① 一系列简单步骤</strong> &nbsp;+&nbsp; <strong>② 有控制流（决定每一步什么时候执行）</strong> &nbsp;+&nbsp; <strong>③ 有办法判断什么时候停止</strong>。
+
+用"烤蛋糕"来对照（Lecture 1 的例子）：
+
+- ① <strong>简单步骤</strong>：混合干料 → 加蛋和牛奶 → 倒进烤盘 → 350°F 烤 5 分钟 → 用牙签戳一下
+- ② <strong>控制流</strong>：如果牙签不干净 → 回去继续烤
+- ③ <strong>终止条件</strong>：牙签干净了 → 拿出来 → 吃 
+
+少了第 ③ 条，就会变成"<strong>死循环</strong>"——这也是后面 `while` 最常见的 bug。
+
+<!--v-->
+
+## 计算机是执行算法的机器
+
+计算机只会做两件事：<strong>执行简单操作</strong>（每秒上千亿次）＋ <strong>记住结果</strong>（上百 GB 存储）。
+
+操作来自两处：机器内建的（`+`、比较大小），以及你作为程序员自己定义的。
+
+<strong>固定程序计算机（fixed program computer）</strong>：程序写死在硬件里，只能做固定的几件事 —— 1940 年代之前的世界。
+
+<strong>存储程序计算机（stored program computer）</strong>：程序和数据一样被存在内存里，随时可以换新的程序 —— 现代计算机。
+
+<strong>程序（program）和其他数据（data）没有本质区别</strong>，都只是内存里的一串东西。
+<!--v-->
+
+## 语言的四个层次
+
+一门语言（自然语言或编程语言）都可以拆成四层。<strong>从左到右，检查越来越难：</strong>
+
+<div class="three-line">
+
+| 层次 | 含义 | Python 例子 |
+|:---:|:---|:---|
+| <strong>原语（primitive）</strong> | 最基本的构成单位 | 数字、字符串、`+` |
+| <strong>句法（syntax）</strong> | 形式是否正确 | `"hi"*5` 合法 &nbsp;&nbsp; `"hi"5` 不合法 |
+| <strong>静态语义（static semantics）</strong> | 形式正确，但有没有意义 | `"hi"+5` 不合法（类型不匹配） |
+| <strong>语义（semantics）</strong> | 真正的含义 | `"hi"*5` → `hihihihihi` |
+
+</div>
+
+前两层 Python 会直接报错；<strong>第 3、4 层是新手最容易出问题的地方</strong>——"没报错，但结果不对"。
+
+<!--v-->
+
+## 出了问题，可能是哪一类？
+
+<div class="three-line">
+
+| 错误类型 | 什么时候发现 | 你会看到什么 |
+|:---|:---|:---|
+| <strong>语法错误 Syntax Error</strong> | 运行前，很容易发现 | `SyntaxError: invalid syntax` |
+| <strong>静态语义错误 Static Semantic Error</strong> | 运行前 / 运行时 | `TypeError`、`NameError` 等 |
+| <strong>语义错误 Semantic Error</strong> | 运行<strong>之后</strong> | 没报错，但结果错 / 卡死 / 崩溃 |
+
+</div>
+
+"没有语言错误，但结果不是你想要的"，通常有三种表现：程序崩溃、<strong>永远跑不完</strong>（死循环）、或者给出一个<strong>错误答案</strong>  最难查的一类。
+
+所以我们要学会 <strong>追踪（trace）</strong>：把每一步的变量值写下来，自己当一次计算机。
+<!--v-->
+
+## 程序 = 定义 + 命令
+
+- 一个 Python 程序就是<strong>定义（definitions）与 命令（commands）</strong>
+  - 定义会被<strong>求值（evaluated）</strong>，命令会被<strong>执行（executed）</strong>
+- 两种使用方式：直接敲在交互式 shell（`>>>`）里立刻看到结果；或写进 `.py` / `.ipynb` 文件一次运行
+
+<strong>从今天开始养成的习惯</strong>：看到任何不懂的语法，打开交互式终端（console）敲一下。
+
+```python-repl
+>>> 3 + 2
+5
+>>> "hi" * 3
+'hihihi'
+>>> "hi" + 5
+TypeError: can only concatenate str (not "int") to str
+```
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Objects, Types and Expressions
+
+</div></div>
+
+<!--v-->
+
+## 一切都是对象，每个对象都有类型
+
+程序操作的是<strong>数据对象（objects）</strong>，每个对象都有一个<strong>类型（type）</strong>，类型决定了"能对它做什么"。
+
+```python-repl
+>>> type(5)
+<class 'int'>
+>>> type(3.0)
+<class 'float'>
+>>> type("Ana")
+<class 'str'>
+```
+
+对象分两大类：
+
+- <strong>标量 Scalar</strong>：不可再分 —— `int`、`float`、`bool`、`NoneType`
+- <strong>非标量 Non-scalar</strong>：内部有结构，可以取出其中一部分 —— `str`、`list`、`dict`
+
+遇到不认识的类型，先用 `type()` 看一眼，这是排错的第一步。
+
+<!--v-->
+
+## 四个标量类型
+
+<div class="three-line">
+
+| 类型 | 含义 | 例子 | 备注 |
+|:---:|:---|:---|:---|
+| `int` | 整数 | `0`、`5`、`-100` | 想多大就多大 |
+| `float` | 实数（浮点数） | `3.27`、`2.0` | 用二进制近似表示，不保证精确（见 Numbers in the Machine 一节）|
+| `bool` | 真值 | `True`、`False` | 注意首字母大写 |
+| `NoneType` | 空 | `None` | 只有一个值 |
+
+</div>
+
+`2.0` 是 `float` 不是 `int`；`True` / `False` 不是字符串，不要加引号。
+
+<!--v-->
+
+## 类型转换（Type Conversion）
+
+- <strong>显式转换</strong>：你自己调用函数
+  - `float(3)` → `3.0`
+  - `int(3.9)` → `3` &nbsp;（<strong>截断</strong>，不是四舍五入！）
+  - `round(3.9)` → `4` &nbsp;（四舍五入）
+- <strong>隐式转换</strong>：Python 自动完成
+  - `1 + 2.0` → `3.0`（`int` 自动升级为 `float`，避免丢掉小数部分）
+
+```python-repl
+>>> type(1 + 2.0)
+<class 'float'>
+>>> "2" + 3
+TypeError: can only concatenate str (not "int") to str
+```
+
+不同类型"能不能混着算"，取决于 Python 是否能安全地做隐式转换；`str` 和 `int` 之间<strong>不会</strong>自动转换，必须自己写 `int()` / `str()`。
+
+<!--v-->
+
+## 两个最容易搞错的取整
+
+```python-repl
+>>> int(7.9)      # 直接砍掉小数部分（向 0 截断）
+7
+>>> round(7.9)    # 真正的四舍五入
+8
+>>> int(-3.9)     # 向 0 截断，所以是 -3 而不是 -4
+-3
+>>> round(2.5), round(3.5)   # Python 用"四舍六入五成双"
+(2, 4)
+```
+
+- <strong>想要整数部分</strong> → `int()`
+- <strong>想要四舍五入</strong> → `round()`
+- 两者和数学课上的取整不完全一样，遇到负数、`.5` 时要特别小心
+
+<!--v-->
+
+## 表达式：对象 + 运算符
+
+- 表达式 <strong>有值、也有类型</strong>
+  - `3 + 2` → 值 `5`，类型 `int`
+  - `5 / 3` → 值 `1.6666666666666667`，类型 `float`
+- Python 求值后<strong>只存值，不存表达式</strong>
+
+基本形式：`<对象> <运算符> <对象>`
+
+<div class="three-line">
+
+| 运算符 | 含义 | 结果类型 |
+|:---:|:---|:---|
+| ` + ` ` - ` ` * ` | 加、减、乘 | 都是 `int` → `int`；有一个 `float` → `float` |
+| ` / ` | 除法 | <strong>永远是 `float`</strong>（`6/3` → `2.0`）|
+| ` // ` | 向下取整除法（floor division） | 与操作数类型一致 |
+| ` % ` | 取余（modulo） | 与操作数类型一致 |
+| ` ** ` | 幂 | `2**10` → `1024` |
+
+</div>
+
+<!--v-->
+
+## 运算符优先级与括号
+
+- 括号里的<strong>最先算</strong>：`(13-4) / (12*12)` → `0.0625`
+- 不带括号时的优先级（从高到低）：
+
+```text
+**                （幂，从右往左）
+*  /  //  %       （同级，从左往右）
++  -              （同级，从左往右）
+```
+
+```python-repl
+>>> 2 + 3 * 4**2      # 4**2=16 → 3*16=48 → 2+48
+50
+>>> 13 - 4 / 12 * 12  # 4/12=0.333… → *12=4.0 → 13-4.0
+9.0
+```
+
+<strong>看不懂就加括号</strong>。加括号不丢人，算错才丢分。
+
+<!--v-->
+
+## 变量：名字绑定到值（binding）
+
+<strong>数学里的变量</strong> vs <strong>计算机里的变量</strong>：
+
+- 数学：`a + 2 = b - 1`，是抽象的、可以有很多解
+- 计算机：<strong>在某一时刻只绑定一个值</strong>，`=` 是<strong>赋值（assignment）</strong>
+
+```python
+pi = 355 / 113
+```
+
+赋值分两步，顺序非常重要：
+
+1. <strong>先算右边</strong>：把 `355/113` 算出来，得到值 `3.1415929203539825`（值存在内存里）
+2. <strong>再绑定左边</strong>：把这个值绑定到名字 `pi` 上
+
+`=` <strong>不是</strong>"等于"，也不是"解方程"。`6 = x`、`x*y = 3+4` 都会报错（左边必须是名字）。
+
+<!--v-->
+
+## 重新绑定：表达式不会自动重算
+
+```python
+pi = 3.14
+radius = 2.0
+area = pi * (radius**2)     # area = 12.56
+
+radius = radius + 1         # radius 变成 3.0
+```
+
+此时 `area` 是多少？
+
+`area` <strong>仍然是 12.56</strong>。`area = pi * radius**2` 只在那一行算了一次，之后改 `radius` 不会让 `area` 自动更新。想让面积是新的值，必须再写一次 `area = pi * (radius**2)`。
+
+变量保存的是值，赋值是一次性的动作。
+
+
+<!--v-->
+
+## 练习：交换两个变量的值
+
+```python
+x = 1
+y = 2
+
+y = x     # 此时 y 变成 1，原来的 2 丢了！
+x = y     # x 也变成 1
+```
+
+答案是 `x = 1, y = 1`：第一句 `y = x` 就把 `y` 原来的值覆盖掉了。
+
+正确写法需要一个<strong>临时变量</strong>（Python 还能一次交换）：
+
+```python
+temp = x       # 先把 x 存起来
+x = y
+y = temp       # 结果 x=2, y=1（也可以写 x, y = y, x）
+```
+<!--v-->
+
+## 变量名要选好
+
+```python
+# 差：看不出在算什么
+a = 355/113 * (2.2**2)
+c = 355/113 * (2.2*2)
+
+# 好：名字自带说明
+pi = 355/113
+radius = 2.2
+area = pi * (radius**2)
+circumference = pi * (radius*2)
+```
+
+- 名字是给<strong>未来的自己</strong>和<strong>同学</strong>看的：今天写、明天读、下个月还要改
+- 变量名：字母、数字、下划线；<strong>不能以数字开头</strong>，不能用关键字
+- 推荐 <strong>snake_case</strong>（小写 + 下划线）：`max_value`
+
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Strings: Indexing and Slicing
+
+</div></div>
+
+<!--v-->
+
+## 字符串是一串字符
+
+- 大小写敏感，由字母、数字、空格、符号组成
+- 用单引号或双引号包起来（保持<strong>前后一致</strong>）
+
+```python-repl
+>>> a = "me"
+>>> b = "myself"
+>>> a + b          # 拼接 concatenate
+'memyself'
+>>> a * 3          # 重复 repeat
+'mememe'
+>>> ":" + ")" * 2  # 混合运算
+':))'
+>>> len("abc")     # 长度
+3
+```
+
+`+` 两边<strong>必须都是字符串</strong>；把数字拼进去要写 `str(3)` 或用 f-string（见 Input, Output and Formatting 一节）。
+
+<!--v-->
+
+## 索引（index）从 0 开始
+
+```text
+字符串:   a     b     c
+正索引:   0     1     2
+负索引:  -3    -2    -1
+```
+
+```python-repl
+>>> s = "abc"
+>>> s[0], s[1], s[2]
+('a', 'b', 'c')
+>>> s[-1], s[-2]      # 从右边数
+('c', 'b')
+>>> s[3]              # 越界！
+IndexError: string index out of range
+```
+
+最后一个字符的下标是 `len(s) - 1`，也就是 `-1`。<strong>先看长度，再谈下标</strong>。
+
+<!--v-->
+
+## 切片（slicing）：`[start : stop : step]`
+
+<strong>含义</strong>：从 `start` 开始，到 `stop` <strong>之前</strong>停止，每隔 `step` 取一个。
+
+- <strong>含头不含尾</strong>：`s[1:4]` 取下标 1、2、3，<strong>不包含</strong> 4
+- 省略的默认值：`start=0`、`stop=len(s)`、`step=1`
+- `step` 为负 → 从右往左走
+
+```python-repl
+>>> t = "abcdefgh"
+>>> t[3:6]        # 下标 3,4,5
+'def'
+>>> t[3:6:2]      # 从 3 开始每隔一个
+'df'
+>>> t[::-1]       # 反过来
+'hgfedcba'
+>>> t[4:1:-2]     # 从 4 往左，每隔一个
+'ec'
+```
+
+<!--v-->
+
+## 切片的三种规律
+
+<strong>① 含头不含尾</strong>：`t[1:4]` 取下标 1、2、3，<strong>不含</strong> 4
+
+```text
+t = "a b c d e f g h"
+     0 1 2 3 4 5 6 7
+       └───┘  t[1:4] → "bcd"
+```
+
+<strong>② 数字可以省略，冒号不能省</strong>
+
+| 写法 | 等价 | 结果 |
+|:---|:---|:---|
+| `t[:3]` | `t[0:3]` | `abc` |
+| `t[5:]` | `t[5:len(t)]` | `fgh` |
+| `t[:]` | `t[0:len(t):1]` | 整个字符串 |
+| `t[-3:]` | `t[len(t)-3:]` | `fgh` |
+
+<strong>③ `step` 的正负决定方向</strong>：正数从左往右（`start` 要小于 `stop`），负数从右往左。
+<!--v-->
+
+## 试一试：先写答案，再敲代码
+
+```python
+s = "ABC d3f ghi"
+```
+
+1. `s[3:len(s)-1]`
+2. `s[4:0:-1]`
+3. `s[6:3]`
+4. `s[::3]`
+
+<strong>参考答案</strong>
+
+- `' d3f gh'` —— 下标 3 到 9（不含），空格也是字符
+- `'d CB'` —— 反向走，`step = -1`，从 4 一路到 1
+- `''` —— <strong>空字符串</strong>！切片越界不报错
+- `'A fh'` —— 下标 0、3、6、9
+<!--v-->
+
+## 字符串不可变（immutable）
+
+```python-repl
+>>> s = "car"
+>>> s[0] = 'b'
+TypeError: 'str' object does not support item assignment
+>>> s = 'b' + s[1:len(s)]    # 造一个新字符串
+>>> s
+'bar'
+```
+
+- <strong>不能修改</strong>已有字符串里的某个字符
+- 但可以<strong>创建一个新对象</strong>，再让变量指向它（旧对象 `"car"` 并没有消失）
+
+<strong>变量名可以改指向，字符串本身改不了</strong>。所有"修改字符串"的操作，本质都是"造一个新的"。
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Input, Output and Formatting
+
+</div></div>
+
+<!--v-->
+
+## `print`：把值展示给用户
+
+```python-repl
+>>> 3 + 2          # 交互模式会自动显示结果
+5
+>>> print(3 + 2)   # 程序里必须显式 print
+5
+```
+
+一次打印多个对象，有两种写法：
+
+```python
+a, b, c = "the", 3, "musketeers"
+print(a, b, c)              # 逗号：自动用空格隔开
+print(a + str(b) + c)       # 加号：拼成一个字符串，需要先 str()
+```
+
+输出都是：`the 3 musketeers`
+
+逗号会<strong>自动加空格</strong>，加号<strong>不会</strong>——OJ 题对输出格式敏感，两者不要混用。
+
+<!--v-->
+
+## `input`：读入一行，返回值永远是字符串
+
+```python
+text = input("Type anything: ")     # 参数会先被打印出来
+print(5 * text)                     # 输入 howdy → howdyhowdyhowdyhowdyhowdy
+
+num1 = input("Type a number: ")     # 输入 5
+print(5 * num1)                     # 字符串 × 5 = 重复 5 次 → 55555
+```
+
+<strong>头号高频 bug</strong>：`input()` 拿到的是 `str`。要做数学运算，必须显式转换：
+`int(input(...))` 或 `float(input(...))`。
+<!--v-->
+
+## 一次读入多个数：`split()` 与 `map()`
+
+```python
+# 输入一行：100 200
+a, b = input().split()          # 默认按空白切分 → ['100', '200']（还是字符串）
+a, b = map(int, input().split())  # 一步到位转成 int
+
+# 也可以用别的分隔符
+a, b = map(int, input().split(','))   # 输入 100,200
+```
+
+- `split()`：把字符串<strong>切成列表</strong>，默认按空格/换行切分
+- `map(int, ...)`：把切分后的每一段都转成 `int`
+
+OJ 上"一行两个整数"的标准写法就是：`a, b = map(int, input().split())`。
+
+<!--v-->
+
+## f-string：最推荐的打印方式
+
+```python
+num = 3000
+fraction = 1/3
+
+print(num*fraction, 'is', fraction*100, '% of', num)   # 逗号版：有空格，浮点数位数很长
+print(num*fraction, 'is', str(fraction*100) + '% of', num)  # 加号版：要手动 str()
+print(f'{num*fraction} is {fraction*100}% of {num}')   # f-string：最清爽
+```
+
+- 字符串前加 `f`，`{}` 里可以写<strong>任意表达式</strong>，会在运行时求值并转成字符串
+- 可以控制格式：`f'{x:.2f}'` 保留 2 位小数
+
+```python-repl
+>>> x = 2.791514
+>>> print(f'x = {x:.2f}')
+x = 2.79
+```
+
+<!--v-->
+
+## 试一试：动词造句器
+
+写一个程序：询问用户一个动词；打印 `I can ___ better than you!`（把 `___` 换成输入内容）；再把 5 个动词用空格连起来打印。
+
+输入 `run` 时，输出应该是：
+
+```text
+I can run better than you!
+run run run run run
+```
+
+<strong>参考答案</strong>
+
+```python
+verb = input("Enter a verb: ")
+print(f"I can {verb} better than you!")
+print((verb + " ") * 4 + verb)
+```
+
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Branching
+
+</div></div>
+
+<!--v-->
+
+## 为什么需要 `bool`？
+
+因为接下来要做<strong>控制流分支（branching）</strong>：如果条件为真，走这条路；否则走另一条路。
+
+所以我们需要一个"真/假"的类型：`bool`，只有两个值 `True`、`False`。
+
+```python-repl
+>>> type(True)
+<class 'bool'>
+>>> 5 > 3
+True
+>>> 5 > 3.0
+True
+```
+
+<!--v-->
+
+## 两个“等号”，完全不同
+
+<div class="row">
+<div class="col">
+
+<strong>`=` 赋值（assignment）</strong>
+
+```python
+x = 5
+```
+
+- 改变 `x` 里存的值
+- 是"动作"，不是"判断"
+
+</div>
+<div class="col">
+
+<strong>`==` 相等测试（equality test）</strong>
+
+```python
+x == 5
+```
+
+- <strong>不改变任何东西</strong>
+- 整行会被替换成 `True` 或 `False`
+
+</div>
+</div>
+
+```python-repl
+>>> x = 5
+>>> x == 5
+True
+```
+
+在 `if` 里误写成 `if x = 5:` 会直接报 `SyntaxError`；`if x == 5` 是相等测试。
+<!--v-->
+
+## 比较运算符与逻辑运算符
+
+<strong>比较运算符</strong>（结果是 `bool`）：`>` `>=` `<` `<=` `==` `!=`
+
+<strong>逻辑运算符</strong>：
+
+<div class="three-line">
+
+| `a` | `b` | `a and b` | `a or b` | `not a` |
+|:---:|:---:|:---:|:---:|:---:|
+| True | True | True | True | False |
+| True | False | False | True | False |
+| False | True | False | True | True |
+| False | False | False | False | True |
+
+</div>
+
+```python
+if x != 0 and 1/x > 2:   # and：两边都真才真（还能避免除以 0！）
+    print("ok")
+```
+
+
+<!--v-->
+
+## 分支（branching）的三种形态
+
+<div class="row">
+<div class="col">
+
+```python
+if cond:
+    # 条件为真时执行
+    ...
+
+# 照常执行
+```
+
+</div>
+<div class="col">
+
+```python
+if cond:
+    ...
+else:
+    ...
+```
+
+</div>
+<div class="col">
+
+```python
+if cond1:
+    ...
+elif cond2:
+    ...
+else:
+    ...
+```
+
+</div>
+</div>
+
+<strong>执行规则（非常重要）</strong>：
+
+- 从上往下检查，<strong>执行第一个条件为真的分支</strong>，然后跳到整个 `if` 结构之后
+- `elif` 可以有很多个，只要有一个命中，后面<strong>都不再检查</strong>
+- `else` 是"以上都不成立"的兜底，可以省略
+
+<!--v-->
+
+## 示例：一天的时间去哪了
+
+```python
+pset_time = float(input("作业时间: "))
+sleep_time = float(input("睡觉时间: "))
+
+if (pset_time + sleep_time) > 24:
+    print("impossible!")
+elif (pset_time + sleep_time) >= 24:
+    print("full schedule!")
+else:
+    leftover = abs(24 - pset_time - sleep_time)
+    print(leftover, "h of free time!")
+
+print("end of day")     # 无论走哪条分支都会执行
+```
+
+注意最后一句 `print("end of day")`：它<strong>不在</strong> `if` 里面（缩进不同），所以一定会执行。
+
+<!--v-->
+
+## 缩进：Python 用它来表示代码块
+
+`x`、`y` 都是 `float(input(...))`，看下面每行的条件结果：
+
+```python
+x = float(input("Enter a number for x: "))
+y = float(input("Enter a number for y: "))
+
+if x == y:
+    print("x and y are equal")          # ①
+    if y != 0:
+        print("therefore, x / y is", x/y)   # ②
+elif x < y:
+    print("x is smaller")               # ③
+else:
+    print("y is smaller")               # ④
+
+print("thanks!")                        # ⑤
+```
+<!--v-->
+
+## 缩进决定谁属于 if：执行轨迹
+
+<div class="three-line">
+
+| 输入 (x, y) | 条件判断 | 会执行哪些行 |
+|:---:|:---|:---|
+| (5, 5) | ①真、②真 | ①②⑤ |
+| (5, 0) | ①真、②假 | ①⑤ |
+| (1, 3) | ①假、③真 | ③⑤ |
+| (3, 1) | ①假、③假 | ④⑤ |
+
+</div>
+
+第 2 行以内层缩进：`y != 0` 的检查只在 `x == y` 成立时才做 —— 避免除以 0。
+<!--v-->
+
+## 找 bug：这段代码为什么不对？
+
+意图：如果两个数相等，才打印 "These are equal!"
+
+```python
+x = int(input("Enter a number for x: "))
+y = int(input("Enter a different number for y: "))
+if x == y:
+    print(x, "is the same as", y)
+print("These are equal!")     # ← 问题在这里
+```
+
+<strong>参考答案</strong>
+
+```python
+if x == y:
+    print(x, "is the same as", y)
+    print("These are equal!")
+```
+<!--v-->
+
+## 分支常见错误清单
+
+<div class="three-line">
+
+| 错误 | 现象 | 正确做法 |
+|:---|:---|:---|
+| `if x = 5:` | `SyntaxError` | 用 `==` 比较 |
+| 缩进不一致（混用 tab/空格）| `IndentationError` | 全文件统一 4 空格 |
+| 该在块内的语句没缩进 | 逻辑错误、总是执行 | 检查缩进层级 |
+| 比较字符串和数字 | `TypeError` 或结果诡异 | 先 `int()` 转换 |
+| 用 `"10" < "9"` 比大小 | 得到 `True`（字符串按字典序）| 转成 `int` 再比 |
+
+</div>
+
+```python-repl
+>>> "10" < "9"      # 字符串比较是逐字符比字典序
+True
+>>> int("10") < int("9")
+False
+```
+
+<!--v-->
+
+## 试一试：猜数字
+
+程序里藏一个数字，让用户猜，告诉他"大了 / 小了 / 猜对了"。
+
+```python
+number = 13
+guess = int(input("Enter an integer: "))
+# 在这里补全
+```
+
+<strong>参考答案</strong>（第一个命中的分支执行后，后面的分支不再检查）
+
+```python
+if guess == number:
+    print("Congratulations, you guessed it.")
+elif guess < number:
+    print("No, it is a little bigger than that.")
+else:
+    print("No, it is a little smaller than that.")
+```
+
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Loops
+
+</div></div>
+
+<!--v-->
+
+## 为什么需要循环？
+
+```python
+# 如果要做 1000 次，你会写疯
+print("x"); print("x"); print("x"); ...   # 重复 1000 次
+
+# 循环：写一次，跑很多次
+n = 1000
+while n > 0:
+    print("x")
+    n = n - 1
+```
+
+循环把重复的工作交给计算机。<strong>能熟练地把重复写成循环，是写程序的基本功。</strong>
+
+<!--v-->
+
+## `while` 循环：条件为真就一直做
+
+```python
+while <condition>:
+    <code>
+    ...
+```
+
+执行顺序：
+
+1. 检查 `<condition>`（`True` / `False`）
+2. 为 `True` → 执行循环体全部语句
+3. <strong>回到第 1 步</strong>，再检查一次
+4. 为 `False` → 跳过循环体，继续执行后面的代码
+
+如果条件<strong>永远为真</strong>，程序就会<strong>死循环</strong>。终止方式：在 shell 里按 `Ctrl + C`，或在 IDE 里点红色的停止按钮。
+
+<!--v-->
+
+## `while` 的执行过程：追踪（trace）
+
+```python
+n = int(input("Enter a non-negative integer: "))   # 输入 4
+while n > 0:
+    print('x')
+    n = n - 1
+```
+
+<div class="three-line">
+
+| 第几次检查 | `n` 的值 | 条件 `n > 0` | 输出 |
+|:---:|:---:|:---:|:---|
+| 1 | 4 | True | x |
+| 2 | 3 | True | x |
+| 3 | 2 | True | x |
+| 5 | 0 | <strong>False</strong> | 循环结束 |
+
+</div>
+
+这个循环里<strong>必须让 `n` 变小</strong>（`n = n - 1`），否则条件永远为真，就成了死循环。
+
+<!--v-->
+
+## 试一试：亲手停掉一个死循环
+
+```python
+while True:
+    print("noooooo")
+```
+
+在你的 IDE 里运行它，然后用 `Ctrl + C`（或在 shell 中点红色方块）停下来。
+
+<strong>想一想</strong>
+
+- `while True:` 的条件永远为真，循环体里也没有任何改变条件的语句 → 永远不会停
+- 这是教学用的例子；真实代码里出现死循环，多半是<strong>忘了更新循环变量</strong>或<strong>条件写反了</strong>
+<!--v-->
+
+## `for` 循环：遍历一个序列
+
+```python
+# 用 while 写：啰嗦，还要自己数到第几个
+n = 0
+while n < 5:
+    print(n)
+    n = n + 1
+
+# 用 for 写：一步到位
+for n in range(5):
+    print(n)
+```
+
+每次循环，`<变量>` 依次取序列里的一个值 —— 第一次取第一个，第二次取第二个……取完就结束。
+
+`for` 帮我们<strong>管好了"取到第几个"</strong>这回事，所以我们更不容易写错。
+<!--v-->
+
+## `range`：最常用的整数序列
+
+`range(start, stop, step)` —— 和切片一样：<strong>含头不含尾</strong>。
+
+<div class="three-line">
+
+| 写法 | 生成的序列 | 说明 |
+|:---|:---|:---|
+| `range(5)` | 0, 1, 2, 3, 4 | `start=0`、`step=1`（最常用）|
+| `range(1, 4)` | 1, 2, 3 | 到 4 之前停 |
+| `range(1, 4, 2)` | 1, 3 | 每隔 2 个取一个 |
+| `range(4, 0, -1)` | 4, 3, 2, 1 | 倒着数 |
+
+</div>
+
+想"从 1 数到 5"要写 `range(1, 6)`（<strong>不包含 stop</strong>）；而 `range(0)` 循环体一次都不执行。
+<!--v-->
+
+## 试一试：预测输出
+
+```python
+for i in range(1, 4, 1):
+    print(i)
+for j in range(1, 4, 2):
+    print(j * 2)
+for me in range(4, 0, -1):
+    print("$" * me)
+```
+
+<strong>参考答案</strong>
+
+```text
+1 2 3                ← i 依次取 1、2、3
+2 6                  ← j 取 1、3，乘 2 后是 2、6
+$$$$ $$$ $$ $        ← me 取 4、3、2、1，符号逐行变少
+```
+<!--v-->
+
+## 追踪循环：累加器（accumulator）
+
+```python
+mysum = 0
+for i in range(10):
+    mysum += i
+print(mysum)
+```
+
+<div class="three-line">
+
+| 轮次 | `i` | 执行后 `mysum` |
+|:---:|:---:|:---:|
+| 1 | 0 | 0 |
+| 2 | 1 | 1 |
+| 3 | 2 | 3 |
+| 10 | 9 | <strong>45</strong> |
+
+</div>
+
+这个模式叫<strong>累加器（accumulator）</strong>：循环<strong>外面</strong>初始化，循环<strong>里面</strong>更新。阶乘、计数、找最大值都是同一个套路。
+<!--v-->
+
+## 试一试：修好这段求和代码
+
+要求：求 `start` 到 `end`（<strong>包含 end</strong>）之间所有整数的和；`start=3, end=5` 时答案应是 12。
+
+```python
+mysum = 0
+start = 3
+end = 5
+for i in range(start, end):
+    mysum += i
+print(mysum)
+```
+
+<strong>参考答案</strong>（现在得到 3+4=7，少了 `end`）
+
+```python
+for i in range(start, end + 1):   # range 不含尾，所以要 +1
+    mysum += i     # 3+4+5 = 12
+```
+<!--v-->
+
+## 阶乘的两种写法
+
+<div class="row">
+<div class="col">
+
+<strong>`while` 版</strong>
+
+```python
+x = 4
+i = 1
+factorial = 1
+while i <= x:
+    factorial *= i
+    i += 1
+print(f'{x}! = {factorial}')
+```
+
+</div>
+<div class="col">
+
+<strong>`for` 版</strong>
+
+```python
+x = 4
+factorial = 1
+for i in range(1, x + 1):
+    factorial *= i
+print(f'{x}! = {factorial}')
+```
+
+</div>
+</div>
+
+两段都输出 `4! = 24`（也就是 1×2×3×4）。
+
+`for` 版少了"自己初始化 `i`、自己 `i += 1`"两件事 —— <strong>能交给 `for` 管的事，就别自己管</strong>。
+<!--v-->
+
+## 用 `while` 还是 `for`？
+
+<div class="three-line">
+
+| 场景 | 推荐 | 原因 |
+|:---|:---|:---|
+| 遍历一串已知的值 / 数字范围 | <strong>`for`</strong> | 不用自己维护计数器，不易出错 |
+| 重复次数不确定（"直到满足条件"）| <strong>`while`</strong> | 用条件表达"什么时候停"最自然 |
+| 需要在循环里改变多个状态 | `while` | 条件可以写得更灵活 |
+
+</div>
+
+一般原则：<strong>能用 `for` 就用 `for`</strong>。只有当"循环几次"本身取决于运行中的状态时，才用 `while`。
+
+<!--v-->
+
+## `break`：提前跳出循环
+
+- 立即结束<strong>当前这一层</strong>循环，跳过循环体剩下的语句
+-  <strong>只跳出最内层的那一个循环</strong>
+
+```python
+mysum = 0
+for i in range(5, 11, 2):     # i = 5, 7, 9
+    mysum += i
+    if mysum == 5:
+        break                 # 满足条件就跳出，后面的 i 不再取
+        mysum += 1            #  永远执行不到！
+print(mysum)
+```
+
+输出是 `5`：`i=5` 时 `mysum` 变成 5，满足条件直接跳出。
+
+`break` <strong>后面</strong>的语句在同一个循环体里永远执行不到——写了就等于没写（有些工具会警告）。
+
+<!--v-->
+
+## 遍历字符串的三种写法
+
+任务：找出字符串里所有的 `i` 或 `u`。
+
+```python
+s = "demo loops - fruit loops"
+for index in range(len(s)):          # ① 用下标
+    if s[index] == 'i' or s[index] == 'u':
+        print("There is an i or u")
+for char in s:                       # ② 直接遍历字符（推荐）
+    if char == 'i' or char == 'u':
+        print("There is an i or u")
+for char in s:                       # ③ 用 in 简化判断
+    if char in 'iu':
+        print("There is an i or u")
+```
+
+`for` 不只遍历数字，<strong>任何"一串东西"都能遍历</strong>：课上用的字符串，以及后面要学的列表、字典。写法 ②③ 更短更清楚。
+<!--v-->
+
+## 试一试：统计不重复的字母
+
+给定一个只含小写字母的字符串 `s`，统计它包含多少个<strong>不同的</strong>字母。
+
+例如 `s = "abca"`，输出 `3`。
+
+提示：用一个字符串变量 `seen` 记下见过的字母；某个字符<strong>不在</strong> `seen` 里时，把它加进去。
+
+<strong>参考答案</strong>
+
+```python
+s = "abca"
+seen = ""
+for char in s:
+    if char not in seen:        # 没见过才加
+        seen += char
+print(len(seen))                # 3
+```
+<!--v-->
+
+## 进阶：只统计第一个 `z` 之前的字母
+
+`s = "abca"` → 输出 `3`； `s = "abzca"` → 输出 `2`（遇到 `z` 就停）
+
+<strong>参考答案</strong>
+
+```python
+s = "abzca"
+seen = ""
+for char in s:
+    if char == "z":
+        break                   # 遇到 z，提前结束
+    if char not in seen:
+        seen += char
+print(len(seen))                # 2
+```
+- 想一想：如果把 `break` 换成 `continue` 会怎样？—— 那只是跳过 `z`，后面的 `c`、`a` 还会继续统计。
+<!--v-->
+
+## `continue`：跳过这一次，继续下一次
+
+<div class="three-line">
+
+| 语句 | 作用 | 常见用途 |
+|:---|:---|:---|
+| `break` | <strong>结束</strong>整个循环 | 已经找到答案，不用再找了 |
+| `continue` | 跳过<strong>本次</strong>剩余语句，进入下一次循环 | 跳过不满足条件的元素 |
+
+</div>
+
+```python
+for i in range(1, 6):
+    if i % 2 == 0:
+        continue        # 偶数跳过，不打印
+    print(i)            # 输出 1 3 5
+```
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Guess-and-Check
+
+</div></div>
+
+<!--v-->
+
+## 什么是 guess-and-check？
+
+也叫<strong>穷举枚举（exhaustive enumeration）</strong>。适用条件：你<strong>能猜</strong>一个答案，并且<strong>能验证</strong>它对不对。
+
+做法：系统化地一个个猜，直到<strong>找到答案</strong>或<strong>猜完所有可能值</strong>。
+
+```text
+   初始猜测
+      │
+      ▼
+  猜对了吗？ ── 是 ──▶ 完成
+      │ 否
+      ▼
+  换下一个猜测（要有系统，例如 +1）
+      │
+      └──── 回到"猜对了吗？"
+```
+
+关键在<strong>两件事</strong>：枚举要<strong>系统化</strong>（不漏、不重），并且想清楚<strong>什么时候停</strong>。
+<!--v-->
+
+## 例：整数平方根
+
+给定整数 `x`，检查是否存在整数 `guess` 使 `guess**2 == x`。
+
+```python
+guess = 0
+while guess**2 < x:              # 还没到就继续猜
+    guess = guess + 1
+if guess**2 == x:
+    print("Square root of", x, "is", guess)
+else:
+    print(x, "is not a perfect square")
+```
+
+从 `guess = 0` 开始一个个往上试（<strong>系统化</strong>）；停止条件是 `guess**2` 已经<strong>不小于</strong> `x`，再往上只会更大。输入 16 时 `guess` 停在 4，输入 24 时停在 5，于是输出 `24 is not a perfect square`。
+
+
+<!--v-->
+
+## 边界情况：负数输入
+
+```python
+guess = 0
+x = int(input("Enter an integer: "))   # 输入 -2
+while guess**2 < x:                    # 0 < -2 是 False
+    guess = guess + 1
+```
+
+循环<strong>一次都不执行</strong>，`guess**2 == x` 也不成立 → 输出 "-2 is not a perfect square"。
+
+这个结果"没崩"，但会让人困惑：<strong>写循环时永远问一句 —— 如果输入是 0、负数、空串，会怎样？</strong>
+<!--v-->
+
+## 显式处理边界：加一个 neg_flag
+
+```python
+guess = 0
+neg_flag = False
+x = int(input("Enter a positive integer: "))
+if x < 0:
+    neg_flag = True
+
+while guess**2 < x:
+    guess = guess + 1
+if guess**2 == x:
+    print("Square root of", x, "is", guess)
+else:
+    print(x, "is not a perfect square")
+    if neg_flag:                          # 只有负数才追问
+        print("Just checking... did you mean", -x, "?")
+```
+<!--v-->
+
+## 例：整数立方根（用 for 循环）
+
+先只处理正数（`cube` 由 `int(input(...))` 得到）：
+
+```python
+for guess in range(cube + 1):
+    if guess**3 == cube:
+        print("Cube root of", cube, "is", guess)
+```
+
+要同时支持<strong>负数</strong>，改用绝对值枚举：
+
+```python
+for guess in range(abs(cube) + 1):    # 0 … |cube|
+    if guess**3 == abs(cube):
+        if cube < 0:
+            guess = -guess            # 负数立方根取负
+        print("Cube root of " + str(cube) + " is " + str(guess))
+```
+
+`range(abs(cube) + 1)` 覆盖了所有可能的答案：<strong>枚举范围要够大，且不能越界</strong>。
+<!--v-->
+
+## 一点优化：`break` 提前退出
+
+```python
+cube = int(input("Enter an integer: "))
+for guess in range(abs(cube) + 1):
+    if guess**3 >= abs(cube):
+        break                      # 再大也不可能相等，提前停
+if guess**3 != abs(cube):
+    print(cube, "is not a perfect cube")
+else:
+    if cube < 0:
+        guess = -guess
+    print("Cube root of " + str(cube) + " is " + str(guess))
+```
+
+- 一旦 `guess**3` 超过目标，后面的猜测只会更大 → 没必要继续
+-  <strong>`for` 的循环变量在循环结束后依然存在</strong>，所以循环外还能用 `guess`
+- 输入 27 → `Cube root of 27 is 3`；输入 10 → `10 is not a perfect cube`
+<!--v-->
+
+## 布尔标志（Boolean flag）
+
+问题：从 1 到 10 里找 `secret`，如果<strong>没找到</strong>要提示。
+
+```python
+secret = 7
+for i in range(1, 11):
+    if i == secret:
+        print("yes, it's", i)
+```
+
+循环结束后，怎么知道"到底找到没有"？单靠 `for` 是说不清的 —— 所以要<strong>立一个旗子</strong>。
+<!--v-->
+
+## 用布尔标志记录发生过什么
+
+```python
+secret = 7
+found = False                  # 先假定没找到
+
+for i in range(1, 11):
+    if i == secret:
+        print("yes, it's", i)
+        found = True           # 找到了，把旗子立起来
+
+if not found:                  # 循环结束后才判断
+    print("not found")
+```
+
+<strong>布尔值可以作为"信号"，记录循环里是否发生过某件事。</strong>
+<!--v-->
+
+## 嵌套循环：小时候的应用题
+
+> Alyssa、Ben、Cindy 三人卖门票：Ben 比 Alyssa 少卖 2 张，Cindy 是 Alyssa 的 2 倍，三人一共卖了 10 张。Alyssa 卖了几张？
+
+不用代数，用猜-检查（<strong>三层循环枚举所有组合</strong>）：
+
+```python
+for alyssa in range(11):
+    for ben in range(11):
+        for cindy in range(11):
+            total = (alyssa + ben + cindy == 10)
+            two_less = (ben == alyssa - 2)
+            twice = (cindy == 2 * alyssa)
+            if total and two_less and twice:
+                print(f"Alyssa {alyssa}, Ben {ben}, Cindy {cindy}")   # 3, 1, 6
+```
+
+把三个条件写进 `bool` 变量，再用 `and` 组合 —— 读起来就像在念题目的条件。
+<!--v-->
+
+## 数字变大以后，暴力枚举行不通
+
+题目改成：Ben 比 Alyssa 少 20 张、Cindy 是 2 倍、一共 1000 张。三层循环要试 1001 × 1001 × 1001 ≈ <strong>10 亿</strong> 次 → 跑不完；不过<strong>只要枚举一个人</strong>就够了。
+
+```python
+for alyssa in range(1001):
+    ben = alyssa - 20            # 用方程代替一个循环
+    cindy = alyssa * 2
+    if ben + cindy + alyssa == 1000:
+        print("Alyssa sold " + str(alyssa) + " tickets")
+        print("Ben sold " + str(ben) + " tickets")
+        print("Cindy sold " + str(cindy) + " tickets")
+```
+
+1001 次 vs 10 亿次，结果一样（Alyssa 255、Ben 235、Cindy 510），速度却天差地别。
+
+<strong>嵌套循环很慢，能不用就不用。用已知条件减少循环层数，是算法优化的第一步。</strong>
+<!--v-->
+
+## 猜-检查用 `while` 还是 `for`？
+
+<div class="three-line">
+
+| | `while` 版 | `for` 版 |
+|:---|:---|:---|
+| 初始猜测 | 自己在循环外初始化 | 不用管 |
+| 换下一个猜测 | 自己在循环体里 `+= 1` | `range` 自动给 |
+| 什么时候停 | 条件由你定义（可以很灵活）| 序列取完就停（或 `break`）|
+| 结论 | 灵活但易错 | 简洁、适合"枚举完所有可能值" |
+
+</div>
+
+两者的关系：<strong>`for` 是"我预先知道要试哪些值"，`while` 是"我不知道要试几次，试到满足条件为止"。</strong>
+
+<!--v-->
+
+## 试一试：找密码
+
+预设一个 secret 数字，检查 1～10 里有没有它；<strong>如果没找到，打印 "not found"</strong>。
+
+<strong>参考答案</strong>
+
+```python
+secret = 7
+found = False
+for i in range(1, 11):
+    if i == secret:
+        print("yes, it's", i)
+        found = True
+if not found:
+    print("not found")
+```
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Numbers in the Machine: Binary and Floating Point
+
+</div></div>
+
+<!--v-->
+
+## 为什么用二进制？
+
+计算机硬件最适合表示<strong>两种状态</strong>：
+
+- 电压"高" / "低"
+- 磁性"向上" / "向下"
+
+所以所有信息（数字、文字、图片、程序）最终都是一串 <strong>bit（0 或 1）</strong>。
+
+- 整数用二进制表示非常自然
+- 那小数怎么办？这就要看 `float` 是怎么存的
+
+<!--v-->
+
+## 十进制转二进制：按 2 的幂展开
+
+<strong>十进制</strong>的 1507 可以写成 10 的幂的加权和：
+
+1507 = 1×10³ + 5×10² + 0×10¹ + 7×10⁰
+
+<strong>二进制</strong>同样的道理，只是换成 2 的幂，系数只能是 0 或 1：
+
+1507 = 1024 + 256 + 128 + 64 + 32 + 2 + 1 = 2¹⁰ + 2⁸ + 2⁷ + 2⁶ + 2⁵ + 2¹ + 2⁰
+
+按位置写下来（有该位写 1，没有写 0）：
+
+```text
+2^10 2^9 2^8 2^7 2^6 2^5 2^4 2^3 2^2 2^1 2^0
+  1    0   1   1   1   1   0   0   0   1   1   →  10111100011₂
+```
+
+```python-repl
+>>> bin(1507)
+'0b10111100011'
+```
+
+<!--v-->
+
+## 用代码做转换：取余与向下取整
+
+<strong>关键观察</strong>：`x % 2` 正好给出<strong>最后一位</strong>，`x // 2` 把所有位<strong>右移一格</strong>。
+
+19 = 10011₂　　→　　19 % 2 = 1（得到最低位）　　19 // 2 = 9 = 1001₂（整体右移一位）
+
+```python
+num = int(input("Enter an integer: "))
+result = ""
+if num == 0:
+    result = "0"
+while num > 0:
+    result = str(num % 2) + result    # 新位拼在最前面
+    num = num // 2                    # 右移一位
+print(result)
+```
+<!--v-->
+
+## 追踪一遍：19 → 10011
+
+```python
+while num > 0:
+    result = str(num % 2) + result
+    num = num // 2
+```
+
+<div class="three-line">
+
+| 轮次 | `num` | `num % 2` | `num // 2` | `result` |
+|:---:|:---:|:---:|:---:|:---|
+| 1 | 19 | 1 | 9 | `"1"` |
+| 2 | 9 | 1 | 4 | `"11"` |
+| 3 | 4 | 0 | 2 | `"011"` |
+| 4 | 2 | 0 | 1 | `"0011"` |
+| 5 | 1 | 1 | 0 | `"10011"` |
+
+</div>
+
+注意是 `result = 新位 + result`：每一位都拼在<strong>前面</strong>，因为先算出来的是最低位。
+<!--v-->
+
+## 二进制小数
+
+- 十进制小数：`0.375 = 3×10⁻¹ + 7×10⁻² + 5×10⁻³`
+- 二进制小数同理：`a×2⁻¹ + b×2⁻² + c×2⁻³`，系数只能是 0 或 1
+
+常用权重：
+
+| 位 | 2⁻¹ | 2⁻² | 2⁻³ | 2⁻⁴ |
+|:---:|:---:|:---:|:---:|:---:|
+| 十进制值 | 0.5 | 0.25 | 0.125 | 0.0625 |
+
+3/8 = 0.375 = 1/4 + 1/8 = 0.011₂
+
+<strong>做法</strong>：先找一个足够大的 2 的幂（`2**p`），把小数<strong>乘成整数</strong>，转成二进制后再把小数点移回去。
+
+0.375 × 2³ = 3 = 11₂　　→　　0.011₂
+
+<!--v-->
+
+## 用代码转二进制小数
+
+思路：先乘 `2**p` 变成整数，再用前面整数转二进制的算法，最后把小数点移回去。
+
+```python
+x = 0.375
+p = 0
+while ((2**p) * x) % 1 != 0:      # 还没变成整数，就让 p 加 1
+    p += 1
+
+num = int(x * (2**p))             # 现在是整数了
+result = ""
+while num > 0:                    # 复用整数转二进制
+    result = str(num % 2) + result
+    num = num // 2
+result = "0" * (p - len(result)) + result      # 左侧补 0，凑够 p 位
+result = result[0:-p] + '.' + result[-p:]   # 插入小数点
+print(f'{x} → {result}')
+```
+
+输出 `0.375 → .011`（即 0.011₂）。
+<!--v-->
+
+## 并不是所有小数都能精确表示
+
+上面那个 `while ((2**p) * x) % 1 != 0` 依赖一件事：<strong>存在整数 `p`，使 `x * 2**p` 变成整数。</strong>
+
+- 3/8：p = 3，可以精确表示
+- 1/10 = 0.1：`0.1 * 2**p` <strong>永远不是整数</strong>，无法精确表示
+
+因为 0.1 = 1/10 = 1/(2 × 5)，分母里有因子 5；二进制小数只能精确表示<strong>约分后分母是 2 的幂</strong>的分数：
+
+0.1₁₀ = 0.000110011001100110011…₂　　（无限循环）
+
+结论：一个分数（约分之后）只要分母含有 2 以外的质因子，它的二进制表示就是无限循环的，计算机只能存一个<strong>近似值</strong>。
+
+<!--v-->
+
+## 浮点数是怎么存的？
+
+`float` = <strong>有效数字（significand）× 2 的指数（exponent）</strong>，也就是一对整数
+
+<div class="three-line">
+
+| 有效数字 | 指数 | 计算 | 值 |
+|:---:|:---:|:---|:---:|
+| 1 | 1 | 1 × 2¹ | 2.0 |
+| 1 | -1 | 1 × 2⁻¹ | 0.5 |
+| 125 | -2 | 125 × 2⁻² | 31.25 |
+
+</div>
+
+拿 31.25 举例：125 的二进制是 `1111101`，再把小数点左移 2 位 → `11111.01₂` = 16 + 8 + 4 + 2 + 1 + 0.25 = 31.25。
+
+- 计算机用<strong>固定位数</strong>存：一般 32 bit，<strong>Python 的 float 是 64 bit</strong>
+- 如果一个数用二进制表示需要的位数超过这个限制，就只能<strong>四舍五入</strong>
+- 这就是"<strong>浮点</strong>"（floating point）这个名字的由来：小数点的位置是浮动的
+
+<!--v-->
+
+## 实验一：`0.1` 累加 10 次 ≠ 1
+
+```python
+x = 0
+for i in range(10):
+    x += 0.1
+print(x == 1)              # False
+print(x, '==', 10 * 0.1)   # 0.9999999999999999 == 1.0
+```
+
+原因：每次加进去的 `0.1` 都只是<strong>近似值</strong>，误差累积起来就差了。
+
+```python-repl
+>>> 0.1 + 0.2 == 0.3
+False
+>>> 0.1 + 0.2
+0.30000000000000004
+```
+<!--v-->
+
+## 实验二：`0.125` 累加 10 次 = 1.25
+
+```python
+x = 0
+for i in range(10):
+    x += 0.125
+print(x == 1.25)      # True
+```
+
+为什么这次对了？因为 0.125 = 1/8 = 2⁻³，是<strong>精确</strong>的二进制小数，不存在表示误差。
+
+<div class="three-line">
+
+| 数 | 分数 | 二进制 | 能精确表示 |
+|:---:|:---:|:---:|:---:|
+| 0.5 | 1/2 | 0.1 | 可以 |
+| 0.125 | 1/8 | 0.001 | 可以 |
+| 0.1 | 1/10 | 0.000110011… | 不可以 |
+
+</div>
+<!--v-->
+
+## 永远不要用 `==` 比较浮点数
+
+```python
+x = 0
+for i in range(10):
+    x += 0.1
+
+print(x == 1)              # False，因为 x 是 0.9999999999999999
+print(abs(x - 1) < 1e-9)   # True，允许一点点误差
+```
+
+其它要点：
+
+- <strong>打印出来的不一定是内存里存的</strong>：`print(0.1)` 显示 `0.1`，内存里存的是 `0.1000000000000000055511…`
+- 需要精确的十进制小数，可以用标准库的 `decimal` 模块（后续课程会讲）
+- 涉及浮点的算法都要小心：比较、累加、判断相等都容易出错
+
+<!--s-->
+
+<div class="middle center"><div style="width: 100%">
+
+# Q & A
+
+</div></div>
+
+
+<!--s-->
+
+<div style="display: flex; justify-content: center; align-items: center; height: 700px;   ">
+  <div style="text-align: center; padding: 40px; background-color: white; border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+    <div style="display: inline-block; padding: 20px 40px; border-radius: 10 px; margin-bottom: 20px;">
+      <h1 style="font-size: 48px; font-weight: bold; margin: 0; color: rgb(16, 33, 89)">Thanks for Listening</h1>
+    </div>
+    <p style="font-size: 24px; color: #666; margin: 0;">Any questions?</p>
+  </div>
+</div>
+          </textarea>
+      </section>
+    </div>
+  </div>
+
+  <script src="./dist/reveal.js"></script>
+
+  <script src="./mermaid/dist/mermaid.min.js"></script>
+
+  <script src="./plugin/markdown/markdown.js"></script>
+  <script src="./plugin/highlight/highlight.js"></script>
+  <script src="./plugin/zoom/zoom.js"></script>
+  <script src="./plugin/notes/notes.js"></script>
+  <script src="./plugin/math/math.js"></script>
+  <!-- Font awesome is required for the chalkboard plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom controls plugin is used to for opening and closing annotation modes. -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/customcontrols/plugin.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/customcontrols/style.css">
+  <!-- Chalkboard plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/plugin.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chalkboard/style.css">
+  <script>
+    function extend() {
+      var target = {};
+      for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+          if (source.hasOwnProperty(key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+      return target;
+    }
+
+    // default options to init reveal.js
+    var defaultOptions = {
+      controls: true,
+      progress: true,
+      history: true,
+      center: false,
+      width: 1000,
+      pdfSeparateFragments: false,
+      transition: 'slide',
+      transitionSpeed: 'fast',
+      slideNumber: "c/t",
+      highlight: {
+        highlightOnLoad: false
+      },
+      plugins: [
+        RevealMarkdown,
+        RevealHighlight,
+        RevealZoom,
+        RevealNotes,
+        RevealMath.KaTeX,
+        RevealChalkboard,
+        RevealCustomControls,
+      ],
+      customcontrols: {
+        controls: [
+          {
+            icon: '<i class="fa fa-pen-square"></i>',
+            title: 'Toggle chalkboard (B)',
+            action: 'RevealChalkboard.toggleChalkboard();'
+          },
+          {
+            icon: '<i class="fa fa-pen"></i>',
+            title: 'Toggle notes canvas (C)',
+            action: 'RevealChalkboard.toggleNotesCanvas();'
+          }
+        ]
+      },
+      chalkboard: {
+        // add configuration here
+      },
+    };
+
+    // options from URL query string
+    var queryOptions = Reveal().getQueryHash() || {};
+
+    var options = extend(defaultOptions, {"_":["slides/Recitation2+/Recitation2+.md"],"static":"static/Recitation2+","template":"./assets/reveal.html","preprocessor":"./assets/preproc.js","scripts":"assets/menu/menu.js,assets/inject.js"}, queryOptions);
+  </script>
+
+  <script src="./_assets/assets/menu/menu.js"></script>
+  <script src="./_assets/assets/inject.js"></script>
+
+  <script>
+    Reveal.initialize(options);
+    Reveal.addEventListener('ready', function (event) {
+      const blocks = Reveal.getRevealElement().querySelectorAll('pre code:not(.mermaid)');
+      const hlp = Reveal.getPlugin('highlight');
+      blocks.forEach(hlp.highlightBlock);
+    });
+  </script>
+
+  <script>
+    const mermaidOptions = extend({ startOnLoad: false }, {});
+    mermaid.startOnLoad = false;
+    mermaid.initialize(mermaidOptions);
+    const cb = function (event) {
+      mermaid.init(mermaidOptions, '.stack.present > .present pre code.mermaid');
+      mermaid.init(mermaidOptions, '.slides > .present:not(.stack) pre code.mermaid');
+    }
+    Reveal.addEventListener('ready', cb);
+    Reveal.addEventListener('slidetransitionend', cb);
+  </script>
+</body>
+
+</html>
