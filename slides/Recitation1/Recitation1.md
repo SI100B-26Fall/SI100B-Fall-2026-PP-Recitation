@@ -157,18 +157,18 @@ makeThanks: true
 
 **Plan B：GitHub 加速镜像**
 
+- macOS / Linux:
+
+```bash
+export UV_DOWNLOAD_URL="https://ghfast.top/https://github.com/astral-sh/uv/releases/download/0.12.16"
+curl -LsSf https://astral.sh/uv/0.12.16/install.sh | sh
+```
+
 - Windows:
 
 ```powershell
 $env:UV_DOWNLOAD_URL = "https://ghfast.top/https://github.com/astral-sh/uv/releases/download/0.12.16"
-powershell -ExecutionPolicy Bypass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-- MacOS:
-
-```bash
-export UV_DOWNLOAD_URL="https://ghfast.top/https://github.com/astral-sh/uv/releases/download/0.12.16"
-curl -LsSf https://astral.sh/uv/install.sh | sh
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.12.16/install.ps1 | iex"
 ```
 
 <!--v-->
@@ -798,7 +798,7 @@ mkdir -p ~/.config/uv && echo -e "[[index]]\nurl = \"https://mirrors.cernet.edu.
 
 - 如何将输入快速用于运算？---`map()`
   ```python-REPL
-  >>> a, b = map(int, input("Please input 'a;b': ").split(';'))
+  >>> a, b = map(int, input("Please input a and b: ").split(';'))
   Please input a and b: 100;200
   >>> type(a)
   <class 'int'> # The input type changed from string to integer
