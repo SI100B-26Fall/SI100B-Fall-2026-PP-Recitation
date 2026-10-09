@@ -338,7 +338,7 @@ start_minute = i - current_run + 2
 
 ## 错误代码 (17pt)
 
-<img src="images/t4_wa0x.png" width="55%" style="float: middle;">
+<img src="images/t4_wa0x.png" width="58%" style="float: middle;">
 
 **这份代码错在哪里？**
 
@@ -346,7 +346,7 @@ start_minute = i - current_run + 2
 
 ## 错误代码 (17pt)
 
-<img src="images/t4_wa0.png" width="55%" style="float: middle;">
+<img src="images/t4_wa0.png" width="58%" style="float: middle;">
 
 **少了一个等号就损失了三分！**
 
@@ -370,7 +370,7 @@ start_minute = i - current_run + 2
 
 ## 错误代码 (16pt)
 
-<img src="images/t4_wa2x.png" width="55%" style="float: middle;">
+<img src="images/t4_wa2x.png" width="46%" style="float: middle;">
 
 **这份代码错在哪里？**
 
@@ -378,7 +378,7 @@ start_minute = i - current_run + 2
 
 ## 错误代码 (16pt)
 
-<img src="images/t4_wa2.png" width="55%" style="float: middle;">
+<img src="images/t4_wa2.png" width="46%" style="float: middle;">
 
 **情况相同，但是各自的代码却写的不一样。**
 
