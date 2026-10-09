@@ -25,555 +25,1145 @@
 <div style="display: flex; justify-content: center; align-items: center; height: 700px;">
   <div style="text-align: center; padding: 40px; background-color: white; border: 2px solid rgb(0, 63, 163); border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
     <h1 style="font-size: 48px; font-weight: bold; margin-bottom: 20px; color: #333;">SI100B Fall 2026 Recitation 3</h1>
-    <p style="font-size: 24px; color: #666;">HW1 题解</p>
-    <p style="font-size: 16px; color: #999; margin-top: 20px; margin-bottom:5px">SI100B 2026 Staff | 2026-10-09</p>
+    <p style="font-size: 24px; color: #666;">Lecture 4–6 正课知识体系复习</p>
+    <p style="font-size: 16px; color: #999; margin-top: 20px; margin-bottom:5px">SI100B 2026 Staff</p>
   </div>
 </div>
 
 <!--s-->
 
 
+
+<style>
+  .reveal h1 code,
+  .reveal h2 code,
+  .reveal h3 code,
+  .reveal h4 code {
+    font-size: 0.78em;
+    padding: 0 4px;
+  }
+</style>
+
 <div class="middle center"><div style="width: 100%">
 
-# 作业讲解
+<div class="middle center"><div style="width: 100%">
+
+# How to Use These Slides
 
 </div></div>
+
+</div></div>
+
+<!--v-->
+
+## 这节课要做什么
+
+本讲把 Lecture 4 – 6 的三块内容按依赖顺序串起来。
+
+- 近似求解（approximation）：答案无法精确求出或穷举不可行时，如何得到一个"足够接近"的结果
+- 函数（functions）：把程序分解成自包含、可复用、有名字的零件
+- 函数作为参数（functions as arguments）：把"做什么"当成参数传进来，把抽象层次再提高一层
+
+<!--v-->
+
+## 学习路线图
+
+<div class="three-line">
+
+| 这一块要解决的问题 | 关键工具 | 对应章节 |
+|:---|:---|:---|
+| 精确解不可得、穷举不可行 | 容差与步长、二分查找、牛顿迭代 | Lecture 4 |
+| 代码越写越长、难以修改 | 分解与抽象、`def`、规格说明 | Lecture 4 后半 + Lecture 5 |
+| 同一套流程要套用不同操作 | 函数作为实参（高阶过程） | Lecture 6 |
+
+</div>
+
+先有"求近似值"的需求，才会发现代码需要被切成零件；有了零件，才会需要把零件本身当参数传递。
 
 <!--s-->
 
 <div class="middle center"><div style="width: 100%">
 
-# Problem 1
-
-</div></div>
-
-<!--v-->
-
-## Problem 1
-
-修复成绩统计程序：读入一个数字串，输出其**长度、数字和、平均值**。
-
-知识点：调试、`str` 与 `int` 的区别、循环边界、变量命名、测试设计
-
-<!--v-->
-
-## 调试证据 1
-
-使用原始程序和样例 `scores = 5839`：
-
-- Python 第一次停在标记 **B**
-- 此时 `total` 是 `0`，类型是 `int`
-- `score` 是 `5`，类型是 `str`
-
-原因：`total + score` 等价于 `int + str`，类型不匹配。
-
-<!--v-->
-
-## 调试证据 2
-
-只把
-
-```py
-score = scores[i]
-```
-
-改成
-
-```py
-score = int(scores[i])
-```
-
-后，前 4 个数字可以正常求和，但 `range(count + 1)` 会让 `i` 取到 `4`。
-
-- 程序停在标记 **A**
-- `i = 4`
-- `count = 4`
-- `total = 25`
-
-这是字符串下标越界。
-
-<!--v-->
-
-## 调试证据 3
-
-继续把
-
-```py
-range(count + 1)
-```
-
-改成
-
-```py
-range(count)
-```
-
-后，循环已经正确，但程序使用了未定义的名字 `totals`。
-
-- 程序停在标记 **C**
-- 错误使用的名字是 `totals`
-- 应该使用的名字是 `total`
-- 此时 `total = 25`
-
-<!--v-->
-
-## 标准答案
-
-```py[]
-scores = input().strip()
-
-count = len(scores)
-total = 0
-
-for i in range(count):
-    score = int(scores[i])
-    total = total + score
-
-average = total / count
-print(count, total, average)
-```
-
-对于 `5839`，输出：
-
-```text
-4 25 6.25
-```
-
-<!--v-->
-
-<!--s-->
-
 <div class="middle center"><div style="width: 100%">
 
-# Problem 2
+# Approximation Methods
+
+</div></div>
 
 </div></div>
 
 <!--v-->
 
-## Problem 2
+## 穷举枚举的三条边界
 
-打印一个右对齐的直角三角形：
+猜测—验证法（guess-and-check）靠枚举有限的整数集合来找精确答案，一旦离开这个前提就不够用。
 
-- 第 1 行有 1 个字符
-- 第 2 行有 2 个字符
-- ...
-- 第 `n` 行有 `n` 个字符
+- 可能的答案集合可以是无限的（任意正数的平方根）
+- 无穷集合无法逐个试完
+- 精确解可能根本不存在：`x` 不是完全平方数时，找不到整数 `r` 使 `r*r == x`
 
-知识点：`for` 循环、`range`、字符串重复、字符串拼接
+于是换一个问法：不要求精确答案，只要求<strong>足够接近</strong>。
 
 <!--v-->
 
-## 标准答案
+## 用容差（epsilon）定义"足够接近"
 
-```py[]
-n = int(input())
-c = input()
+给定正数 `x`，我们要找 `r` 满足 `|r**2 - x| < epsilon`。
 
-for i in range(1, n + 1):
-    print(' ' * (n - i) + c * i)
+<svg viewBox="0 0 920 200" width="94%" style="display:block;margin:6px auto;">
+  <line x1="70" y1="118" x2="870" y2="118" stroke="#444" stroke-width="2"/>
+  <text x="70" y="144" text-anchor="middle" font-size="15" fill="#555">0</text>
+  <text x="870" y="144" text-anchor="middle" font-size="15" fill="#555">x</text>
+  <rect x="400" y="82" width="150" height="72" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="475" y="74" text-anchor="middle" font-size="15" fill="#2e7d32" font-weight="bold">误差 < epsilon</text>
+  <text x="475" y="126" text-anchor="middle" font-size="16" fill="#1b5e20">√x 附近</text>
+  <circle cx="250" cy="118" r="5" fill="#c62828"/>
+  <text x="250" y="144" text-anchor="middle" font-size="15" fill="#c62828">猜得偏小，继续加</text>
+  <circle cx="700" cy="118" r="5" fill="#c62828"/>
+  <text x="700" y="144" text-anchor="middle" font-size="15" fill="#c62828">猜得偏大，跨过了</text>
+  <text x="470" y="186" text-anchor="middle" font-size="15" fill="#333">不要求 r² 正好等于 x，只要求 |r² − x| 落进这条绿色带里</text>
+</svg>
+
+- <strong>容差（epsilon）</strong>是我们自己定的精度上限，不是一个固定常数
+- 判据写成 `abs(guess**2 - x) >= epsilon` 就是"还不够近，继续试"
+- 这样就把"求平方根"变成"让误差降到容差以内"的循环问题
+
+<!--v-->
+
+## 增量逼近：三步走的算法
+
+1. 从 `guess = 0.0` 出发
+2. 每次让 `guess` 增加一个很小的量 `increment`（步长）
+3. 每轮检查 `abs(guess**2 - x) >= epsilon`，不满足就继续加
+
+步长决定精度上限：步长比容差还粗，就可能每次都跨过答案。
+
+```python
+x = 36
+epsilon = 0.01
+num_guesses = 0
+guess = 0.0
+increment = 0.0001
+
+while abs(guess**2 - x) >= epsilon:
+    guess += increment
+    num_guesses += 1
+
+print('num_guesses =', num_guesses)
+print(guess, 'is close to square root of', x)
 ```
 
+`x = 36` 时结果是 `guess` 接近 6（实测 `5.9992`），代价是接近 6 万次猜测（实测 `59992` 次）。
+
 <!--v-->
 
-## 代码逐行理解
+## 先用最小例子看清机制
 
-当 `i` 从 1 增加到 `n` 时：
+把 `x` 换成完全平方数 25、步长取 `0.01`，猜测过程一眼能看完：
 
-- 字符数量是 `i`，所以写成 `c * i`
-- 空格数量是 `n - i`
-- 空格逐渐减少，字符逐渐增加，整体右对齐
+<div class="three-line">
 
-例如 `n = 4`、`c = *` 时：
+| guess | guess**2 | abs(guess**2 - 25) | 是否停止 |
+|:---:|:---:|:---:|:---|
+| 4.00 | 16.00 | 9.00 | 继续 |
+| 4.50 | 20.25 | 4.75 | 继续 |
+| 4.90 | 24.01 | 0.99 | 继续 |
+| 4.99 | 24.9001 | 0.0999 | 继续 |
+| 5.00 | 25.00 | 0.00 | 停止（误差小于 epsilon）|
 
-```text
-   *
-  **
- ***
-****
+</div>
+
+误差随 `guess` 增大而变小，直到落进 `epsilon = 0.01` 以内。所谓近似求解，就是让这个误差逐步贴近 0。
+
+<!--v-->
+
+## 参数怎么选：效率与精度的取舍
+
+<div class="three-line">
+
+| 调整 | 程序速度 | 结果精度 |
+|:---|:---|:---|
+| 步长 `increment` 变小 | 更慢 | 更可能拿到好结果 |
+| 步长 `increment` 变大 | 更快 | 可能直接跨过答案 |
+| 容差 `epsilon` 变大 | 更快 | 结果更粗糙 |
+| 容差 `epsilon` 变小 | 更慢 | 结果更精确 |
+
+</div>
+
+两个参数一起决定"猜多少次、猜多准"。设置参数时先问自己：这道题要求的精度到底是多少。
+
+<!--v-->
+
+## 反例：猜测越过答案之后
+
+把 `x` 换成 `54321`，其余参数不变，循环<strong>不会退出</strong>。
+
+```python
+x = 54321
+epsilon = 0.01
+numGuesses = 0
+guess = 0.0
+increment = 0.0001
+while abs(guess**2 - x) >= epsilon:
+    guess += increment
+    numGuesses += 1
+print('numGuesses =', numGuesses)
 ```
 
-<!--v-->
+原因：`sqrt(54321)` 约等于 `233.07`，`guess` 从 0 每次加 `0.0001`，会在 233 附近"跨过"答案。
 
-### （拓展）另一种理解
+- 跨过之前：`guess**2` 比 `x` 小，差值是几十
+- 跨过之后：`guess**2` 比 `x` 大，差值还是几十
+- 误差从来没有落进 `0.01` 以内，条件永远为真
 
-- `range(1, n + 1)` 表示 `1, 2, ..., n`
-- `字符串 * 整数` 表示重复字符串
-- `+` 可以拼接两个字符串
-
-这题不需要双重循环。直接构造每一行的空格部分和字符部分，代码更短，也更容易检查。
-
-<!--s-->
-
-<div class="middle center"><div style="width: 100%">
-
-# Problem 3
-
-</div></div>
+这一步有个名字叫 <strong>overshoot</strong>：从"差得还远但偏小"直接跳到"差得还远但偏大"。
 
 <!--v-->
 
-## Problem 3
+## 修法一：给循环加一个上界
 
-计算 Collatz 序列从 `n` 变到 `1` 需要的步数。
+在条件里补上 `and guess**2 <= x`：一旦平方超过 `x` 就停止循环。
 
-规则：
+```python
+x = 54321
+epsilon = 0.01
+numGuesses = 0
+guess = 0.0
+increment = 0.0001
+while abs(guess**2 - x) >= epsilon and guess**2 <= x:
+    guess += increment
+    numGuesses += 1
 
-- 如果 `n` 是偶数，`n = n // 2`
-- 如果 `n` 是奇数，`n = 3n + 1`
-- 重复直到 `n == 1`
+print('numGuesses =', numGuesses)
+if abs(guess**2 - x) >= epsilon:
+    print('Failed on square root of', x)
+else:
+    print(guess, 'is close to square root of', x)
+```
 
-知识点：`while` 循环、条件语句、整除运算、整数与浮点数
+循环能退出了，但输出 `Failed on square root of 54321`：程序知道自己失败了，这比死循环好，但仍然没算出答案。
 
 <!--v-->
 
-## 标准答案
+## 修法二：把步长调细
 
-```py[]
-n = int(input())
+把 `increment` 从 `0.0001` 改成 `0.00001`，误差就能落进 `0.01` 以内，代价是尝试次数变成原来的十倍。
 
-count = 0
-while n != 1:
-    if n % 2 == 0:
-        n //= 2
+<div class="three-line">
+
+| 步长 | 终止方式 | 代价 |
+|:---|:---|:---|
+| `0.0001` | 跨过答案，报 `Failed` | 快，但结果无效 |
+| `0.00001` | 误差进入容差，成功 | 慢十倍 |
+
+</div>
+
+这类"改小步长"的调参思路并不可取：靠调参碰运气，不如换一个更好的算法。
+
+<!--v-->
+
+## 近似法的五条教训
+
+1. 不能用 `==` 判断循环是否该退出，浮点结果几乎不会正好相等
+2. 循环机制不能"跳过"退出条件，否则会一直循环下去
+3. 设置参数之前，先想清楚答案需要多精确
+4. 算法效率与结果精度之间存在取舍
+5. 即使参数合适，这种方法也可能慢得让人难受
+
+前两条正是 `54321` 那个反例暴露的问题。
+
+<!--v-->
+
+## 二分查找：凭什么能快这么多
+
+二分查找能成立，靠的是两条前提：
+
+1. 搜索空间是<strong>有序</strong>的
+2. 我们能判断某次猜测是<strong>偏小还是偏大</strong>
+
+满足这两条，就可以每轮把候选范围砍掉一半：猜中点，偏小就丢掉左半，偏大就丢掉右半。
+
+用猜数字游戏理解：448 页的教材里藏着目标页码，每次告诉你"高了"或"低了"，最多 9 次就能锁定，因为 `2**9 = 512` 已经覆盖 448。
+
+<!--v-->
+
+## 对数增长：N 变成 1 需要多少次
+
+每次砍一半：`N → N/2 → N/4 → ...`，第 `k` 次猜测时范围只剩 `N / 2**k`。
+
+<div class="three-line">
+
+| 范围剩下的量 | 需要的猜测次数 |
+|:---|:---|
+| `N / 2` | 1 |
+| `N / 4` | 2 |
+| `N / 2**k` | k |
+| `1` | `log2(N)` |
+
+</div>
+
+同一个 `54321`，逐次加固定步长（步长 `0.00001`）要 2300 万次以上，二分查找只要 30 次左右——这就是对数增长与线性增长的差距。
+
+<!--v-->
+
+## bisection 求平方根：完整代码
+
+```python
+x = 54321
+epsilon = 0.01
+num_guesses = 0
+low = 0
+high = x
+guess = (high + low)/2.0
+
+while abs(guess**2 - x) >= epsilon:
+    if guess**2 < x:
+        low = guess
     else:
-        n = 3 * n + 1
-    count += 1
+        high = guess
+    guess = (high + low)/2.0
+    num_guesses += 1
 
-print(count)
+print('num_guesses =', num_guesses)
+print(guess, 'is close to square root of', x)
 ```
+
+四句话说完：维护一个区间 `[low, high]`，取中点当猜测，根据平方比 `x` 大还是小丢掉一半区间，然后重新取中点。
 
 <!--v-->
 
-## 为什么用 `//`
+## 追踪一遍 bisection
 
-```py
-n //= 2
-```
+以 `x = 25`、`epsilon = 0.01` 为例，区间每次都减半。
 
-而不是
+<div class="three-line">
 
-```py
-n /= 2
-```
+| 轮次 | low | high | guess | guess**2 |
+|:---:|:---:|:---:|:---:|:---:|
+| 初始 | 0 | 25 | 12.5 | 156.25（偏大）|
+| 1 | 0 | 12.5 | 6.25 | 39.06（偏大）|
+| 2 | 0 | 6.25 | 3.125 | 9.77（偏小）|
+| 3 | 3.125 | 6.25 | 4.6875 | 21.97（偏小）|
+| 4 | 4.6875 | 6.25 | 5.46875 | 29.91（偏大）|
 
-- `/` 的结果永远是 `float`
-- `//` 在两个整数相除时保留整数类型
-- 本题始终在整数序列上操作，使用整除更符合题意
+</div>
 
-<!--s-->
-
-<div class="middle center"><div style="width: 100%">
-
-# Problem 4
-
-</div></div>
+每轮区间长度减半，十几轮之后误差就小于 `0.01`。关键不在"猜得准"，而在"每次都能确定地把错的半区扔掉"。
 
 <!--v-->
 
-## Problem 4
+## 区间是怎么减半的
 
-找出最长的连续高读数区间：
-
-- 高读数：数字大于等于 `limit`
-- 低读数：数字小于 `limit`
-- 缺失读数：`-`
-- 低读数和缺失读数都会断开连续区间
-
-输出最长长度和最早开始位置。
-
-知识点：区间维护、边界处理、严格大于、下标换算
-
-<!--v-->
-
-## 反例 A：处理 `-`
-
-```text
-readings = 114-514
-limit = 3
-```
-
-正确答案是：
-
-```text
-1 3
-```
-
-minute 3 的 `4` 是唯一达到阈值的读数；后面的 `-` 必须断开当前区间。
-
-<!--v-->
-
-## 反例 B：长度相同取最早
-
-```text
-readings = 233233233
-limit = 3
-```
-
-正确答案是：
-
-```text
-2 2
-```
-
-这里有多段长度相同的区间。题目要求取**最早开始**的一段，所以更新条件应使用：
-
-```py
-current_run > longest_run
-```
-
-而不是 `>=`。
+<svg viewBox="0 0 920 262" width="94%" style="display:block;margin:4px auto;">
+  <text x="70" y="16" font-size="14" fill="#667">灰条 = 最初的 [0, 25]　蓝条 = 还没被排除的部分　红点 = 这一轮的 guess</text>
+  <g font-size="14" fill="#333">
+    <text x="4" y="46">初始</text>
+    <rect x="70" y="34" width="460" height="16" rx="3" fill="#eef1f6"/>
+    <rect x="70" y="34" width="460" height="16" rx="3" fill="#cfe0ff" stroke="#003fa3"/>
+    <circle cx="300" cy="42" r="4" fill="#c62828"/>
+    <text x="550" y="46">12.5² = 156.25　偏大 → 丢右半</text>
+    <text x="4" y="86">第1轮</text>
+    <rect x="70" y="74" width="460" height="16" rx="3" fill="#eef1f6"/>
+    <rect x="70" y="74" width="230" height="16" rx="3" fill="#cfe0ff" stroke="#003fa3"/>
+    <circle cx="185" cy="82" r="4" fill="#c62828"/>
+    <text x="550" y="86">6.25² = 39.06　偏大 → 丢右半</text>
+    <text x="4" y="126">第2轮</text>
+    <rect x="70" y="114" width="460" height="16" rx="3" fill="#eef1f6"/>
+    <rect x="70" y="114" width="115" height="16" rx="3" fill="#cfe0ff" stroke="#003fa3"/>
+    <circle cx="127" cy="122" r="4" fill="#c62828"/>
+    <text x="550" y="126">3.125² = 9.77　偏小 → 丢左半</text>
+    <text x="4" y="166">第3轮</text>
+    <rect x="70" y="154" width="460" height="16" rx="3" fill="#eef1f6"/>
+    <rect x="127" y="154" width="58" height="16" rx="3" fill="#cfe0ff" stroke="#003fa3"/>
+    <circle cx="156" cy="162" r="4" fill="#c62828"/>
+    <text x="550" y="166">4.6875² = 21.97　偏小 → 丢左半</text>
+    <text x="4" y="206">第4轮</text>
+    <rect x="70" y="194" width="460" height="16" rx="3" fill="#eef1f6"/>
+    <rect x="156" y="194" width="29" height="16" rx="3" fill="#cfe0ff" stroke="#003fa3"/>
+    <circle cx="171" cy="202" r="4" fill="#c62828"/>
+    <text x="550" y="206">5.46875² = 29.91　偏大 → 丢右半</text>
+  </g>
+  <text x="460" y="248" text-anchor="middle" font-size="15" fill="#333">每轮区间长度减半：猜偏大就丢右半，猜偏小就丢左半，十几轮后误差就小于 epsilon</text>
+</svg>
 
 <!--v-->
 
-## 标准答案
+## 边界情况：0 < x < 1
 
-```py[]
-readings = input().strip()
-limit = int(input())
+区间不能一律写成 `[0, x]`，因为 `0 < x < 1` 时 `sqrt(x) > x`，答案不在这个区间里。
 
-current_run = 0
-longest_run = 0
-start_minute = 0
+```python
+x = 0.5
+epsilon = 0.01
+if x >= 1:
+    low = 1.0
+    high = x
+else:
+    low = x
+    high = 1.0
+guess = (high + low)/2
 
-for i in range(len(readings)):
-    ch = readings[i]
-
-    if ch == '-' or int(ch) < limit:
-        current_run = 0
+while abs(guess**2 - x) >= epsilon:
+    if guess**2 < x:
+        low = guess
     else:
-        current_run += 1
+        high = guess
+    guess = (high + low)/2.0
 
-        if current_run > longest_run:
-            longest_run = current_run
-            start_minute = i - current_run + 2
-
-print(longest_run, start_minute)
+print(f'{str(guess)} is close to square root of {str(x)}')
 ```
 
+`x = 0.5` 时答案约 `0.707`，落在 `[0.5, 1]` 里；如果沿用 `[0, x]`，区间永远不会包含答案。
+
 <!--v-->
 
-## 核心思想
+## 牛顿—拉夫森法：用导数一步比一步近
 
-- `current_run` 记录**当前连续区间长度**
-- 遇到低读数或缺失读数时，立即清零
-- 遇到高读数时，长度加一
-- 只有**严格大于**历史最长时才更新答案
-- `i` 是从 0 开始的下标，题目分钟数从 1 开始
+求 `k` 的平方根等价于求 `p(x) = x**2 - k` 的根。迭代式是
 
-```py
-start_minute = i - current_run + 2
+`guess = guess - (guess**2 - k) / (2 * guess)`
+
+其中 `2 * guess` 正是 `p(x)` 的导数。直觉：把当前猜测处的切线延长到与横轴相交，交点就是下一个猜测。
+
+```python
+epsilon = 0.01
+k = 24.0
+guess = k/2.0
+num_guesses = 0
+
+while abs(guess*guess - k) >= epsilon:
+    num_guesses += 1
+    guess = guess - (((guess**2) - k)/(2*guess))
+print('num_guesses = ' + str(num_guesses))
+print('Square root of ' + str(k) + ' is about ' + str(guess))
 ```
 
-<!--v-->
-
-## 常见错误
-
-1. 忘记 `-` 也会断开区间
-2. 只在遇到低读数时更新答案，忘记序列末尾也是区间边界
-3. 使用 `>=` 更新，导致同样长度时取到较晚区间
-4. 把 0-based 下标直接当题目中的分钟数输出
-5. 没有先明确当前区间和历史最优区间分别记录什么
+`k = 24` 时从 `12.0` 出发，几次迭代就收敛到 `4.899` 附近，比二分查找需要的轮数更少。
 
 <!--v-->
 
-## 错误代码 (17pt)
+## 四种生成猜测的方法对照
 
-<img src="images/t4_wa0x.png" width="58%" style="float: middle;">
+<div class="three-line">
 
-**这份代码错在哪里？**
+| 方法 | 思路 | 54321 的代价 |
+|:---|:---|:---|
+| 穷举枚举 | 逐个试整数 | 只对完全平方数有效 |
+| 增量逼近 | 每次加固定步长（`0.00001`） | 2300 万次以上 |
+| 二分查找 | 每次丢掉一半区间 | 30 次左右 |
+| 牛顿—拉夫森 | 用导数迭代 | 收敛更快 |
 
-<!--v-->
+</div>
 
-## 错误代码 (17pt)
-
-<img src="images/t4_wa0.png" width="58%" style="float: middle;">
-
-**少了一个等号就损失了三分！**
-
-<!--v-->
-
-## 错误代码 (19pt)
-
-<img src="images/t4_wa1x.png" width="55%" style="float: middle;">
-
-**这份代码错在哪里？**
-
-<!--v-->
-
-## 错误代码 (19pt)
-
-<img src="images/t4_wa1.png" width="55%" style="float: middle;">
-
-**注意缩进！**
-
-<!--v-->
-
-## 错误代码 (16pt)
-
-<img src="images/t4_wa2x.png" width="46%" style="float: middle;">
-
-**这份代码错在哪里？**
-
-<!--v-->
-
-## 错误代码 (16pt)
-
-<img src="images/t4_wa2.png" width="46%" style="float: middle;">
-
-**情况相同，但是各自的代码却写的不一样。**
+选哪种方法取决于问题本身：有没有序、能不能判断偏大偏小、能不能求导。
 
 <!--s-->
 
 <div class="middle center"><div style="width: 100%">
 
-# Problem 5
+<div class="middle center"><div style="width: 100%">
+
+# Decomposition and Functions
+
+</div></div>
 
 </div></div>
 
 <!--v-->
 
-## Problem 5
+## 为什么要分解与抽象
 
-给定数字串 `s` 和步长 `k`：
+在讲函数之前，先看两个动机：
 
-1. 从左到右，每隔 `k` 个取一个数字求和
-2. 从右到左，每隔 `k` 个取一个数字求乘积
+- <strong>分解（decomposition）</strong>：把一段程序切成若干自包含的部分，每部分只负责一件事
+- <strong>抽象（abstraction）</strong>：忽略不必要的细节，把"做什么"和"怎么做"分开
 
-知识点：`range` 的三个参数、字符串下标、累加、累乘
-
-<!--v-->
-
-## 标准答案
-
-```py[]
-s = input()
-k = int(input())
-
-total = 0
-for i in range(0, len(s), k):
-    total += int(s[i])
-print(total)
-
-product = 1
-for i in range(len(s) - 1, -1, -k):
-    product *= int(s[i])
-print(product)
-```
-
-这里用 `total` 代替内置函数名 `sum`，避免覆盖内置名字。
+好处是代码更容易创建、修改、维护和理解。没有函数时，所有细节都堆在一起，读代码的人要一次性接收全部细节。
 
 <!--v-->
 
-## `range` 三参数
+## 把函数当成黑盒
 
-```py
-range(start, stop, step)
-```
+函数是<strong>可复用的代码零件</strong>。调用者只需要知道它接受什么、返回什么，不需要知道内部怎么算。
 
-从左到右：
-
-```py
-range(0, len(s), k)
-```
-
-产生的下标是：
-
-```text
-0, k, 2k, ...
-```
-
-从右到左：
-
-```py
-range(len(s) - 1, -1, -k)
-```
-
-产生的下标是：
-
-```text
-len(s)-1, len(s)-1-k, ...
-```
+- `bisection_root(4)` 的调用者不用关心内部是二分还是牛顿法
+- 这个视角叫黑盒（black box）：<strong>一次调用，一个结果</strong>
+- 只要规格不变，内部实现可以随便改
 
 <!--v-->
 
-## 例子
+## 函数长什么样：定义与规格
 
-若：
-
-```text
-s = 123456
-k = 2
+```python
+def is_even( i ):
+    """
+    Input: i, a positive int
+    Returns True if i is even, otherwise False
+    """
+    return i%2 == 0
 ```
 
-求和取下标 `0, 2, 4`：
+三部分缺一不可：
 
-```text
-1 + 3 + 5 = 9
-```
-
-求乘积取下标 `5, 3, 1`：
-
-```text
-6 × 4 × 2 = 48
-```
-
-因此输出：
-
-```text
-9
-48
-```
+- `def` 开头的函数名与形参列表
+- 紧跟其后的三引号字符串是规格（specs）：写清输入是什么、返回什么
+- 函数体：真正做事的语句，通过 `return` 交回结果
 
 <!--v-->
 
-## 累加与累乘
+## 规格先写，函数体后写
 
-累加初值：
+好的做法是：先想清楚问题，再用规格把名字、输入、输出定下来。
 
-```py
-total = 0
+- 想清楚"给定一个整数，要判断它是不是偶数"
+- 据此写出函数名 `is_even` 与三引号规格
+- 函数体可以先空着，等规格稳定了再填
+
+规格先行还有一个好处：函数体怎么写都不影响调用者，只要 `Input` / `Returns` 不变。
+
+<!--v-->
+
+## 调用：函数体只在被调用时执行
+
+```python
+is_even(3)
+is_even(8)
+print(is_even(3))
 ```
 
-累乘初值：
+- <strong>函数定义本身不执行函数体</strong>，只有调用（call / invoke）时才执行
+- 这一点很关键：Python binds formal parameters in function def with values from function call
+- 形参（formal parameter）是定义里的名字，实参（argument）是调用时给出的值
+- 最后一行打印 `False`，因为 `3 % 2` 是 1
 
-```py
-product = 1
+<!--v-->
+
+## 调用时发生了什么
+
+一次函数调用按四步进行：
+
+1. Python 为这次调用创建一个新环境（environment，也叫 frame / scope）
+2. 把实参的值绑定到形参上
+3. 在新环境里逐句执行函数体
+4. 遇到 `return`，把返回值替换掉整个函数调用表达式，环境随之消失
+
+"环境消失"意味着函数里的局部变量在函数返回后就查不到了。
+
+<!--v-->
+
+## return 把值交回调用处
+
+`return i%2 == 0` 做的事是"算出这个布尔值并交回调用处"。
+
+- 调用表达式 `is_even(3)` 的值就是 `return` 后面的值
+- 可以把它赋给变量、传给别的函数、或者 `print` 出来
+- `return` 一旦执行，函数立刻结束，后面的语句不再执行
+
+<!--v-->
+
+## 没有 return 会怎样
+
+如果函数体里没有 `return`，Python 会返回 `None`。
+
+```python
+def is_even( i ):
+    """
+    Input: i, a positive int
+    Does not return anything
+    """
+    i%2 == 0
 ```
 
-因为任何数加 `0` 不变，任何数乘 `1` 不变。
+- `None` 表示"没有值"，在交互式环境里不会打印任何东西
+- 这不是错误：`return None` 和裸 `return` 与上面写法等价
+- 但如果调用者拿它去参与运算，就会在别处报错
 
-不要把乘积初值写成 `0`，否则最终结果一定是 `0`。
+<!--v-->
+
+## print 与 return 的区别
+
+看一道调用题，结论如下。
+
+```python
+def add(x, y):
+    return x + y
+def mult(x, y):
+    print(x*y)
+
+add(1, 2)            # 什么都没打印：返回值被丢掉了
+print(add(2, 3))     # 5
+mult(3, 4)           # 12（print 在函数内部发生）
+print(mult(4, 5))    # 先打印 20，再打印 None
+```
+
+`print` 是"往屏幕写一行"，`return` 是"把值交给调用者"。函数内部打印了，不代表调用者拿到了值。
+
+<!--v-->
+
+## 案例：把二分求根封装成函数
+
+```python
+def bisection_root(x):
+    epsilon = 0.01
+    low = 0
+    high = x
+    ans = (high + low)/2.0
+    while abs(ans**2 - x) >= epsilon:
+        if ans**2 < x:
+            low = ans
+        else:
+            high = ans
+        ans = (high + low)/2.0
+    return ans
+```
+
+```python
+print(bisection_root(4))
+print(bisection_root(123))
+```
+
+同一个函数换不同实参就能复用：`epsilon` 从参数挪进了函数体，调用者不必再关心它。
+
+<!--v-->
+
+## 函数支持模块化：两层结构
+
+再写一个调用它的函数，也就是把大问题拆成两层。
+
+```python
+def count_nums_with_sqrt_close_to(n, epsilon):
+    """ n is an int > 2
+      epsilon is a positive number < 1
+      Returns how many integers have a square
+      root within epsilon of n """
+```
+
+以 `n = 10`、`epsilon = 0.1` 调用，答案是 `4`。
+
+底层函数负责"算一个平方根"，上层函数负责"数有多少个满足条件"，这就是模块化（modularity）。
+
+<!--v-->
+
+## 默认参数
+
+有些参数几乎每次都用同一个值，可以写在定义里当默认值。
+
+```python
+def bisection_root_new(x, epsilon = 0.01):
+```
+
+<div class="three-line">
+
+| 调用写法 | 结果 |
+|:---|:---|
+| `bisection_root_new(123)` | 用默认 `epsilon = 0.01` |
+| `bisection_root_new(123, 0.001)` | 按位置传第二个参数 |
+| `bisection_root_new(123, epsilon = 0.001)` | 关键字传参 |
+| `bisection_root_new(0.001, 123)` | 不报错，但含义完全错了 |
+| `bisection_root_new(epsilon = 0.001, 123)` | 报错：位置实参必须写在关键字实参之前 |
+
+</div>
+
+规则只有一条：<strong>默认参数必须放在参数列表最后</strong>。
+
+<!--v-->
+
+## 作用域：函数里的名字从哪来
+
+```python
+def sum_odd(a, b):
+    sum_of_odds = 0
+    for i in range(a, b+1):
+        if i%2 == 1:
+            sum_of_odds += i
+    return sum_of_odds
+
+low = 2
+high = 7
+my_sum = sum_odd(low, high)
+```
+
+- 程序作用域里有 `sum_odd`（一个函数对象）、`low = 2`、`high = 7`
+- 调用返回后，`my_sum` 绑定到 `15`
+- `sum_of_odds` 和 `i` 只存在于函数内部的环境里，函数外面查不到
+
+<!--v-->
+
+## 追踪一次函数调用
+
+```python
+def f( x ):
+    x = x + 1
+    print('in f(x): x =', x)
+    return x
+
+x = 3
+z = f( x )
+```
+
+<div class="three-line">
+
+| 时刻 | 全局作用域 | `f` 的作用域 |
+|:---|:---|:---|
+| 定义 `f` 之后 | `f` → 函数对象 | — |
+| `x = 3` 之后 | `x` → 3 | — |
+| 调用 `f(x)` 时 | `x` → 3 | 形参 `x` → 3 |
+| 执行 `x = x + 1` | `x` → 3 | `x` → 4，打印 `in f(x): x = 4` |
+| `return x` 之后 | `x` → 3，`z` → 4 | 环境消失 |
+
+</div>
+
+函数内外各有一个 `x`，改函数里的那个不会动全局的。
+
+<!--v-->
+
+## 两个作用域各有一份 x
+
+<svg viewBox="0 0 920 300" width="94%" style="display:block;margin:4px auto;">
+  <rect x="40" y="24" width="380" height="230" rx="10" fill="#f6f8fb" stroke="#003fa3" stroke-width="1.5"/>
+  <text x="230" y="56" text-anchor="middle" font-size="17" fill="#003fa3" font-weight="bold">Global 作用域</text>
+  <line x1="60" y1="70" x2="400" y2="70" stroke="#c9d4e6"/>
+  <text x="72" y="106" font-size="16" fill="#222">f</text>
+  <text x="180" y="106" font-size="16" fill="#555">→ 函数对象</text>
+  <text x="72" y="146" font-size="16" fill="#222">x</text>
+  <text x="180" y="146" font-size="16" fill="#c62828" font-weight="bold">→ 3</text>
+  <text x="72" y="186" font-size="16" fill="#222">z</text>
+  <text x="180" y="186" font-size="16" fill="#c62828" font-weight="bold">→ 4</text>
+  <text x="72" y="228" font-size="14" fill="#778">函数返回后依然存在</text>
+
+  <rect x="500" y="24" width="380" height="230" rx="10" fill="#fffaf0" stroke="#c99a2e" stroke-width="1.5"/>
+  <text x="690" y="56" text-anchor="middle" font-size="17" fill="#a9791a" font-weight="bold">f 的临时环境</text>
+  <line x1="520" y1="70" x2="860" y2="70" stroke="#e8dcc0"/>
+  <text x="532" y="106" font-size="16" fill="#222">形参 x</text>
+  <text x="660" y="106" font-size="16" fill="#2e7d32" font-weight="bold">→ 4</text>
+  <text x="532" y="146" font-size="14" fill="#778">x = x + 1 改的是这一份</text>
+  <text x="532" y="186" font-size="14" fill="#778">return 之后整个环境消失</text>
+  <text x="532" y="228" font-size="14" fill="#778">全局的 x 仍然是 3</text>
+
+  <text x="460" y="286" text-anchor="middle" font-size="15" fill="#333">函数调用会创建一个新环境；赋值只改这个临时环境里的名字，动不了全局的那一份</text>
+</svg>
+
+<!--v-->
+
+## 函数内能读外部变量，但不能改
+
+用三个函数对比三种情况：
+
+```python
+def f(y):        def g(y):          def h(y):
+    x = 1            print(x)           x += 1
+    x += 1           print(x + 1)
+    print(x)                       x = 5
+                     x = 5              h(x)
+x = 5            g(x)               print(x)
+f(x)             print(x)
+print(x)
+```
+
+<div class="three-line">
+
+| 函数 | 发生了什么 | 输出 |
+|:---|:---|:---|
+| `f` | 内部新建了局部 `x`，与全局无关 | 2、5 |
+| `g` | 只读全局 `x`，之后又新建局部 `x` | 5、6、5 |
+| `h` | `x += 1` 把 `x` 变成局部的，读它时还没赋值 | 报错 |
+
+</div>
+
+`h` 的报错是 `UnboundLocalError`：只要函数里对某个名字有赋值，整个函数内它都算局部变量。用 `global` 可以改全局变量，但这是不推荐的做法。
+
+<!--v-->
+
+## LEGB：名字查找的四个层次
+
+Python 按固定顺序查找一个名字：
+
+<div class="three-line">
+
+| 层次 | 含义 |
+|:---|:---|
+| Local | 函数内部被赋值的名字（未声明 global） |
+| Enclosing-function | 外层函数的局部名字，由内向外逐层找 |
+| Global | 模块顶层赋值的名字 |
+| Built-in | 内置模块里预先定义的名字，如 `len`、`abs`、`range` |
+
+</div>
+
+查找顺序是 Local → Enclosing → Global → Built-in，前面的找不到才往后找。
+
+<!--v-->
+
+## 查找顺序
+
+<svg viewBox="0 0 920 232" width="94%" style="display:block;margin:4px auto;">
+  <rect x="60" y="16" width="800" height="42" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.2"/>
+  <text x="80" y="43" font-size="16" fill="#1b5e20" font-weight="bold">① Local</text>
+  <text x="290" y="43" font-size="15" fill="#333">函数内部被赋值的名字（未声明 global）</text>
+  <rect x="60" y="66" width="800" height="42" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.2"/>
+  <text x="80" y="93" font-size="16" fill="#0d47a1" font-weight="bold">② Enclosing</text>
+  <text x="290" y="93" font-size="15" fill="#333">外层函数的局部名字，由内向外逐层找</text>
+  <rect x="60" y="116" width="800" height="42" rx="6" fill="#fff8e1" stroke="#c99a2e" stroke-width="1.2"/>
+  <text x="80" y="143" font-size="16" fill="#a9791a" font-weight="bold">③ Global</text>
+  <text x="290" y="143" font-size="15" fill="#333">模块顶层赋值的名字</text>
+  <rect x="60" y="166" width="800" height="42" rx="6" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="1.2"/>
+  <text x="80" y="193" font-size="16" fill="#6a1b9a" font-weight="bold">④ Built-in</text>
+  <text x="290" y="193" font-size="15" fill="#333">内置模块里预先定义的名字，如 len、abs、range</text>
+</svg>
+
+从上往下依次查找：只有①里找不到，才去②；②也没有，才继续往下。四层都没有，才抛 `NameError`。
+
+<!--v-->
+
+## 写函数的方法论
+
+完整流程如下：
+
+1. 不要一上来就写代码，先在纸上想（paper first）
+2. 写出一个简单测试用例，再写一个更复杂的
+3. 先解一个相似或更简单的问题
+4. 定下大结构：这段逻辑是循环还是条件？`for` 还是 `while`？
+5. 先让简单版本跑通，再逐步加功能
+6. 经常测试；出错时用 `print` 把中间值打出来
+
+"先解简化版、再补功能"是其中最关键的一条。
+
+<!--v-->
+
+## 案例：sum_odd 的排错过程
+
+同一个问题的 `for` 与 `while` 版本，第一次测试就出现了不一致：
+
+```python
+def sum_odd(a, b):
+    sum_of_odds = 0
+    for i in range(a, b):
+        sum_of_odds += i
+    return sum_of_odds
+```
+
+`sum_odd(2, 4)` 的 `for` 版返回 `5`（只加了 2 和 3），`while` 版返回 `9`（`i <= b` 把 4 也加上了）。
+
+- 用 `print(i, sum_of_odds)` 把每轮的值打出来，就能看到 `for` 版少了最后一轮
+- 修正：把 `range(a, b)` 改成 `range(a, b + 1)`
+- 再加上 `if i%2 == 1` 只累加奇数，`sum_odd(2, 4)` 得到 `3`，`sum_odd(2, 7)` 得到 `15`
+
+`range` 含头不含尾，是这类差一错（off-by-one）的常见来源。
 
 <!--s-->
 
 <div class="middle center"><div style="width: 100%">
 
-# 总结
+<div class="middle center"><div style="width: 100%">
+
+# Functions as Arguments
+
+</div></div>
 
 </div></div>
 
 <!--v-->
 
-## 本次作业关键词
+## 函数也是对象（first-class object）
 
-- **类型**：字符串数字和整数不同
-- **边界**：`range(count)`、字符串末尾、序列末尾
-- **循环**：`for` 适合确定范围，`while` 适合未知次数
-- **区间**：当前长度、历史最长、更新条件
-- **命名**：变量名必须完全一致，尽量不要覆盖内置名
+Python 里的一切都是对象（Everything in Python is an object），函数也不例外。
+
+Python 里的类型有 `int`、`float`、`str`、`Boolean`、`NoneType`，还有 `function`。
+
+```python
+def is_even(i):
+    return i%2 == 0
+
+my_func = is_even      # 把名字绑到函数对象上，不是调用
+a = is_even(3)         # 调用，得到 False
+b = my_func(4)         # 通过别名调用，得到 True
+```
+
+`my_func` 和 `is_even` 指向同一个函数对象，两个名字可以互换使用。
 
 <!--v-->
 
-## 调试建议
+## 把函数作为参数传进去
 
-1. 先读题和样例，再写代码
-2. 明确每个变量的含义和类型
-3. 手动模拟一个短样例
-4. 遇到错误时，看第一处错误，不要只看最终报错行
-5. 修复一个错误后重新运行，再找下一个错误
+函数能当实参，就能把"做什么"从"怎么做"里抽出来。
 
-<!--s-->
+```python
+def calc(op, x, y):
+    return op(x, y)
+
+def add(a, b):
+    return a + b
+
+print(calc(add, 2, 3))
+```
+
+- 传函数时<strong>只写函数名，不加括号</strong>：`calc(add, 2, 3)`
+- 真正调用发生在 `calc` 内部：`op(x, y)`
+- 形参匹配：`op` ← `add`、`x` ← 2、`y` ← 3，接着为 `add` 新建作用域 `a` ← 2、`b` ← 3
+- 输出 `5`
+
+<!--v-->
+
+## 高阶过程到底高在哪
+
+<svg viewBox="0 0 920 222" width="94%" style="display:block;margin:6px auto;">
+  <defs>
+    <marker id="r3ho" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#666"/></marker>
+  </defs>
+  <text x="120" y="24" text-anchor="middle" font-size="14" fill="#8894a8">不同的"做什么"</text>
+  <rect x="20" y="38" width="200" height="52" rx="6" fill="#fff8e1" stroke="#c99a2e" stroke-width="1.2"/>
+  <text x="120" y="70" text-anchor="middle" font-size="15" fill="#a9791a">add(a, b) → a + b</text>
+  <rect x="20" y="108" width="200" height="52" rx="6" fill="#fff8e1" stroke="#c99a2e" stroke-width="1.2"/>
+  <text x="120" y="140" text-anchor="middle" font-size="15" fill="#a9791a">div(a, b) → a / b</text>
+  <line x1="222" y1="64" x2="328" y2="94" stroke="#666" stroke-width="1.5" marker-end="url(#r3ho)"/>
+  <line x1="222" y1="134" x2="328" y2="106" stroke="#666" stroke-width="1.5" marker-end="url(#r3ho)"/>
+  <rect x="330" y="44" width="240" height="112" rx="8" fill="#f6f8fb" stroke="#003fa3" stroke-width="1.5"/>
+  <text x="450" y="88" text-anchor="middle" font-size="16" fill="#003fa3" font-weight="bold">calc(op, x, y)</text>
+  <text x="450" y="114" text-anchor="middle" font-size="14" fill="#555">同一套"怎么算"</text>
+  <text x="450" y="136" text-anchor="middle" font-size="14" fill="#555">只负责调用 op(x, y)</text>
+  <line x1="572" y1="100" x2="648" y2="100" stroke="#666" stroke-width="2" marker-end="url(#r3ho)"/>
+  <rect x="650" y="70" width="222" height="60" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.2"/>
+  <text x="761" y="106" text-anchor="middle" font-size="15" fill="#1b5e20">calc(add, 2, 3) → 5</text>
+  <text x="460" y="202" text-anchor="middle" font-size="15" fill="#333">换一个"做什么"，"怎么算"的代码一行都不用改</text>
+</svg>
+
+<!--v-->
+
+## 追踪一次高阶调用
+
+用一整套命名来展示求值顺序：建立作用域、匹配形参、执行语句、用返回值替换函数调用。
+
+```python
+def calc(op, x, y):
+    return op(x, y)
+
+def add(a, b):
+    return a + b
+
+res = calc(add, 2, 3)
+```
+
+<div class="three-line">
+
+| 步骤 | 发生了什么 |
+|:---|:---|
+| 1 | 为 `calc` 新建作用域，`op` ← `add`、`x` ← 2、`y` ← 3 |
+| 2 | 执行 `return op(x, y)`，这里才去调用 `op` |
+| 3 | 为 `add` 新建作用域，`a` ← 2、`b` ← 3，返回 `5` |
+| 4 | `op(x, y)` 这个调用被 `5` 替换，`calc` 返回 `5` |
+| 5 | `res` 绑定到 `5`，两个临时环境都消失 |
+
+</div>
+
+环境要逐层看：主程序在全局环境里，每次函数调用各自有一个临时环境。
+
+<!--v-->
+
+## 一个完整的例子：三个函数的嵌套调用
+
+```python
+def func_a():
+    print('inside func_a')
+def func_b(y):
+    print('inside func_b')
+    return y
+def func_c(f, z):
+    print('inside func_c')
+    return f(z)
+
+print(func_a())          # 先打印 inside func_a，再打印 None
+print(5 + func_b(2))     # 先打印 inside func_b，再打印 7
+print(func_c(func_b, 3)) # 依次打印 inside func_c、inside func_b，再打印 3
+```
+
+三行的区别正好覆盖三种情况：没有 `return` 的函数、返回值参与运算、函数作为参数被再次调用。
+
+<!--v-->
+
+## 传函数名与调用函数，只差一对括号
+
+这是这一节最容易错的地方。
+
+```python
+def div(a, b):
+    if b != 0:
+        return a/b
+    print("Denom was 0.")
+
+res = calc(div, 2, 0)
+```
+
+- `calc(div, 2, 0)`：把 `div` 这个函数对象传给 `calc`
+- `div(2, 0)`：立刻执行 `div`
+- `b == 0` 时 `div` 只打印 `Denom was 0.`，没有 `return`，所以返回 `None`
+
+这一题的实际结果是：屏幕打印 `Denom was 0.`，`res` 的值是 `None`。
+
+<!--v-->
+
+## 函数也能作为返回值
+
+函数是对象，所以可以像其他对象一样被返回。
+
+```python
+def make_prod(a):
+    def g(b):
+        return a*b
+    return g
+
+val = make_prod(2)(3)      # 写法一：连写两次调用
+print(val)                 # 6
+
+doubler = make_prod(2)     # 写法二：先把函数存下来
+val = doubler(3)
+print(val)                 # 6
+```
+
+两种写法等价。`make_prod(2)` 返回的是内层函数 `g`，它执行时仍然看得到外层作用域里的 `a = 2`。
+
+<!--v-->
+
+## 匿名函数：lambda
+
+函数很简单、又只用一次时，可以不给它起名字。
+
+```python
+def is_even(x):            # 具名写法
+    return x % 2 == 0
+
+lambda x: x % 2 == 0       # 匿名写法，等价
+```
+
+- `lambda` 后面是参数，冒号后面是函数体，<strong>不需要 `return`</strong>
+- 它同样创建一个函数对象，只是不绑定名字
+- 因为没名字，无法复用，所以 lambda 也被称为一次性的
+- 它可以直接写在实参位置上：`apply(lambda x: x%2 == 0, 10)`
+
+<!--v-->
+
+## 两个高阶抽象的例子
+
+```python
+def apply(criteria, n):
+    """ criteria is a func that takes in a number and returns a bool
+    n is an int
+    Returns how many ints from 0 to n (inclusive) match the criteria """
+
+def do_twice(n, fn):
+    return fn(fn(n))
+
+print(do_twice(3, lambda x: x**2))
+```
+
+- `apply` 把"数一遍"和"判断标准"拆开：判断标准作为参数传进来
+- 补全 `apply` 后，`apply(is_even, 10)` 得 `6`（0 到 10 里有 6 个偶数）
+- `do_twice(3, lambda x: x**2)` 先算 `3**2 = 9`，再算 `9**2 = 81`，输出 `81`
+
+同一个流程套不同的函数，就是高阶过程（higher order procedure）的价值。
+
+<!--v-->
+
+## 元组：一个新的数据类型
+
+到这一讲为止，标量类型有 `int`、`float`、`bool`，复合类型只见过字符串；元组是第二个复合类型。
+
+```python
+tuple_empty = ()
+tuple_short = (2,)            # 一个元素的元组
+hello_tuple = (2, "stu", 3)   # 三个元素
+```
+
+- 元组是<strong>不可变</strong>的：`hello_tuple[1] = 4` 会报 `TypeError`
+- 元素类型可以混合，甚至可以嵌套另一个元组
+- <strong>决定元组的是逗号，不是括号</strong>：`(2,)` 是元组，`(2)` 只是整数 2
+
+<!--v-->
+
+## 元组的索引与切片
+
+规则和字符串一致：索引从 0 开始，切片含头不含尾。
+
+```python
+seq = (2, "a", 4, (1, 2))
+print(len(seq))        # 4
+print(seq[3])          # (1, 2)
+print(seq[3][0])       # 1
+print(seq[-2:])        # (4, (1, 2))
+print(seq[1:4:2])      # ('a', (1, 2))
+print(seq[:-1])        # (2, 'a', 4)
+```
+
+- `seq[3][0]` 是"先取第 3 个元素，再取它的第 0 个元素"，可以连着写
+- `seq[4]` 会报 `IndexError`；切片越界不会报错
+- 元组可以用 `for e in seq` 逐个遍历
+
+<!--v-->
+
+## 解包与交换
+
+```python
+x = 1
+y = 2
+(x, y) = (y, x)     # 一步完成交换
+```
+
+- 等号右边先把 `y`、`x` 打包成元组，再解包给左边的两个名字
+- 括号可以省略：`x, y = 1, 2` 与 `(x, y) = (1, 2)` 等价
+- 元组相加是拼接，乘整数是重复：`(2, "stu", 3) + (5, 6)` 得 `(2, "stu", 3, 5, 6)`，`(1, 2) * 2` 得 `(1, 2, 1, 2)`
+
+<!--v-->
+
+## 用元组返回多个值
+
+函数一次只能返回一个对象，但那个对象可以是元组，于是等于返回了多个值。
+
+```python
+def quotient_and_remainder(x, y):
+    q = x // y
+    r = x % y
+    return (q, r)      # 一个对象，两个元素
+
+both = quotient_and_remainder(10, 3)        # (3, 1)
+(quot, rem) = quotient_and_remainder(5, 2)  # quot = 2, rem = 1
+```
+
+- 调用处可以直接解包成两个变量
+- 一句话记住：返回一个元组，就能返回多个值
+- 左侧名字个数要和元素个数一致，否则报错
+
+<!--v-->
+
+## 可变数量的参数
+
+```python
+def mean(*args):
+    tot = 0
+    for a in args:     # args 绑定到一个元组
+        tot += a
+    return tot / len(args)
+
+print(mean(1, 2, 3, 4, 5, 6))   # 3.5
+```
+
+- 参数名前的 `*` 表示"收集所有位置实参"
+- `args` 在函数体里就是一个元组，所以能遍历、能取 `len`
+- `mean(1, 2, 3, 4, 5, 6)` 求和得 21，除以 6 得 `3.5`
+
+<!--v-->
+
+## 这一讲把抽象又提高了一层
+
+<div class="three-line">
+
+| 层次 | 传什么 | 例子 |
+|:---|:---|:---|
+| 值 | 数字、字符串 | `area(2.2)` |
+| 函数 | 一段"做什么" | `calc(add, 2, 3)` |
+| 返回函数 | 造一个新的"做什么" | `make_prod(2)` |
+| 匿名函数 | 只用一次的"做什么" | `lambda x: x**2` |
+
+</div>
+
+判断标准作为参数传进来之后，"数一遍"的流程可以完全不动，只换判定规则。这就是高阶过程带来的可读性。
 
 
 <!--s-->
@@ -668,7 +1258,7 @@ product = 1
     // options from URL query string
     var queryOptions = Reveal().getQueryHash() || {};
 
-    var options = extend(defaultOptions, {"_":["slides/Recitation3/Recitation3.md"],"static":"static/Recitation3","template":"./assets/reveal.html","preprocessor":"./assets/preproc.js","scripts":"assets/menu/menu.js,assets/inject.js"}, queryOptions);
+    var options = extend(defaultOptions, {"_":["slides/Recitation3_Supplement/Recitation3.md"],"static":"static/Recitation3","template":"./assets/reveal.html","preprocessor":"./assets/preproc.js","scripts":"assets/menu/menu.js,assets/inject.js"}, queryOptions);
   </script>
 
   <script src="./_assets/assets/menu/menu.js"></script>
