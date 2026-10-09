@@ -107,8 +107,6 @@ makeThanks: true
 2. 每次让 `guess` 增加一个很小的量 `increment`（步长）
 3. 每轮检查 `abs(guess**2 - x) >= epsilon`，不满足就继续加
 
-步长决定精度上限：步长比容差还粗，就可能每次都跨过答案。
-
 ```python
 x = 36
 epsilon = 0.01
@@ -124,7 +122,7 @@ print('num_guesses =', num_guesses)
 print(guess, 'is close to square root of', x)
 ```
 
-`x = 36` 时结果是 `guess` 接近 6（实测 `5.9992`），代价是接近 6 万次猜测（实测 `59992` 次）。
+`x = 36` 时 `guess` 接近 6（实测 `5.9992`），代价是约 6 万次猜测（实测 `59992` 次）。
 
 <!--v-->
 
@@ -181,11 +179,7 @@ while abs(guess**2 - x) >= epsilon:
 print('numGuesses =', numGuesses)
 ```
 
-原因：`sqrt(54321)` 约等于 `233.07`，`guess` 从 0 每次加 `0.0001`，会在 233 附近"跨过"答案。
-
-- 跨过之前：`guess**2` 比 `x` 小，差值是几十
-- 跨过之后：`guess**2` 比 `x` 大，差值还是几十
-- 误差从来没有落进 `0.01` 以内，条件永远为真
+原因：`sqrt(54321)` ≈ `233.07`，`guess` 每次加 `0.0001`，会在 233 附近跨过答案。相邻两次猜测的平方相差约 `2 × 233.07 × 0.0001 ≈ 0.047`，比容差带宽度 `2 × epsilon = 0.02` 还大，于是误差最小只降到约 `0.019`，始终没落进 `0.01`，条件永远为真。
 
 这一步有个名字叫 <strong>overshoot</strong>：从"差得还远但偏小"直接跳到"差得还远但偏大"。
 
@@ -286,7 +280,6 @@ num_guesses = 0
 low = 0
 high = x
 guess = (high + low)/2.0
-
 while abs(guess**2 - x) >= epsilon:
     if guess**2 < x:
         low = guess
@@ -294,12 +287,11 @@ while abs(guess**2 - x) >= epsilon:
         high = guess
     guess = (high + low)/2.0
     num_guesses += 1
-
 print('num_guesses =', num_guesses)
 print(guess, 'is close to square root of', x)
 ```
 
-四句话说完：维护一个区间 `[low, high]`，取中点当猜测，根据平方比 `x` 大还是小丢掉一半区间，然后重新取中点。
+维护区间 `[low, high]`，取中点当猜测，按平方与 `x` 的大小丢掉一半，再取中点。
 
 <!--v-->
 
@@ -361,40 +353,31 @@ print(guess, 'is close to square root of', x)
 
 ## 边界情况：0 < x < 1
 
-区间不能一律写成 `[0, x]`，因为 `0 < x < 1` 时 `sqrt(x) > x`，答案不在这个区间里。
+`0 < x < 1` 时 `sqrt(x) > x`，所以区间不能一律写成 `[0, x]`。
 
 ```python
 x = 0.5
 epsilon = 0.01
-if x >= 1:
-    low = 1.0
-    high = x
-else:
-    low = x
-    high = 1.0
+low, high = (1.0, x) if x >= 1 else (x, 1.0)
 guess = (high + low)/2
-
 while abs(guess**2 - x) >= epsilon:
     if guess**2 < x:
         low = guess
     else:
         high = guess
     guess = (high + low)/2.0
-
 print(f'{str(guess)} is close to square root of {str(x)}')
 ```
 
-`x = 0.5` 时答案约 `0.707`，落在 `[0.5, 1]` 里；如果沿用 `[0, x]`，区间永远不会包含答案。
+`x = 0.5` 时答案约 `0.707`，落在 `[0.5, 1]` 内。
 
 <!--v-->
 
 ## 牛顿—拉夫森法：用导数一步比一步近
 
-求 `k` 的平方根等价于求 `p(x) = x**2 - k` 的根。迭代式是
+求 `k` 的平方根等价于求 `p(x) = x**2 - k` 的根。迭代式是 `guess = guess - (guess**2 - k) / (2 * guess)`，其中 `2 * guess` 正是 `p(x)` 的导数。
 
-`guess = guess - (guess**2 - k) / (2 * guess)`
-
-其中 `2 * guess` 正是 `p(x)` 的导数。直觉：把当前猜测处的切线延长到与横轴相交，交点就是下一个猜测。
+直觉：把当前猜测处的切线延长到与横轴相交，交点就是下一个猜测。
 
 ```python
 epsilon = 0.01
@@ -667,20 +650,17 @@ def f( x ):
 x = 3
 z = f( x )
 ```
-
 <div class="three-line">
 
 | 时刻 | 全局作用域 | `f` 的作用域 |
 |:---|:---|:---|
-| 定义 `f` 之后 | `f` → 函数对象 | — |
-| `x = 3` 之后 | `x` → 3 | — |
+| 定义 `f` 后 | `f` → 函数对象 | — |
+| `x = 3` 后 | `x` → 3 | — |
 | 调用 `f(x)` 时 | `x` → 3 | 形参 `x` → 3 |
 | 执行 `x = x + 1` | `x` → 3 | `x` → 4，打印 `in f(x): x = 4` |
-| `return x` 之后 | `x` → 3，`z` → 4 | 环境消失 |
+| `return x` 后 | `x` → 3，`z` → 4 | 环境消失 |
 
 </div>
-
-函数内外各有一个 `x`，改函数里的那个不会动全局的。
 
 <!--v-->
 
@@ -714,30 +694,37 @@ z = f( x )
 
 ## 函数内能读外部变量，但不能改
 
-用三个函数对比三种情况：
+### 三种写法
 
 ```python
-def f(y):        def g(y):          def h(y):
-    x = 1            print(x)           x += 1
-    x += 1           print(x + 1)
-    print(x)                       x = 5
-                     x = 5              h(x)
-x = 5            g(x)               print(x)
-f(x)             print(x)
-print(x)
+def f(y):
+    x = 1          # 新建局部 x
+    x += 1
+    print(x)
+
+def g(y):
+    print(x)       # 只读全局 x
+    print(x + 1)
+
+def h(y):
+    x += 1         # x 变成局部，读它时还没赋值
 ```
+
+<!--v-->
+
+### 结果对照与原因
 
 <div class="three-line">
 
 | 函数 | 发生了什么 | 输出 |
 |:---|:---|:---|
-| `f` | 内部新建了局部 `x`，与全局无关 | 2、5 |
-| `g` | 只读全局 `x`，之后又新建局部 `x` | 5、6、5 |
-| `h` | `x += 1` 把 `x` 变成局部的，读它时还没赋值 | 报错 |
+| `f` | 内部新建局部 `x`，与全局无关 | 2 |
+| `g` | 只读全局 `x`，没有赋值 | 5、6 |
+| `h` | `x += 1` 让 `x` 成为局部，读它时还没赋值 | 报错 |
 
 </div>
 
-`h` 的报错是 `UnboundLocalError`：只要函数里对某个名字有赋值，整个函数内它都算局部变量。用 `global` 可以改全局变量，但这是不推荐的做法。
+`h` 报 `UnboundLocalError`：函数里只要对某个名字有赋值，整个函数内它都算局部。
 
 <!--v-->
 
@@ -893,7 +880,7 @@ print(calc(add, 2, 3))
 
 ## 追踪一次高阶调用
 
-用一整套命名来展示求值顺序：建立作用域、匹配形参、执行语句、用返回值替换函数调用。
+求值顺序：建作用域 → 匹配形参 → 执行语句 → 用返回值替换调用。
 
 ```python
 def calc(op, x, y):
@@ -905,19 +892,9 @@ def add(a, b):
 res = calc(add, 2, 3)
 ```
 
-<div class="three-line">
+<!--v-->
 
-| 步骤 | 发生了什么 |
-|:---|:---|
-| 1 | 为 `calc` 新建作用域，`op` ← `add`、`x` ← 2、`y` ← 3 |
-| 2 | 执行 `return op(x, y)`，这里才去调用 `op` |
-| 3 | 为 `add` 新建作用域，`a` ← 2、`b` ← 3，返回 `5` |
-| 4 | `op(x, y)` 这个调用被 `5` 替换，`calc` 返回 `5` |
-| 5 | `res` 绑定到 `5`，两个临时环境都消失 |
-
-</div>
-
-环境要逐层看：主程序在全局环境里，每次函数调用各自有一个临时环境。
+## 高阶调用的五步
 
 <!--v-->
 
