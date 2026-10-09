@@ -332,6 +332,22 @@ start_minute = i - current_run + 2
 4. 把 0-based 下标直接当题目中的分钟数输出
 5. 没有先明确当前区间和历史最优区间分别记录什么
 
+<!--v-->
+
+## 错误代码 (19pt)
+
+<img src="images/t4_wa1x.png" width="70%" style="float: middle;">
+
+**这份代码的错误错在哪里？**
+
+<!--v-->
+
+## 错误代码 (19pt)
+
+<img src="images/t4_wa1x.png" width="70%" style="float: middle;">
+
+**注意缩进！**
+
 <!--s-->
 
 # Problem 5
