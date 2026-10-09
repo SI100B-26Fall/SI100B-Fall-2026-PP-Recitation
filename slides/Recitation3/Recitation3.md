@@ -324,6 +324,8 @@ print(longest_run, start_minute)
 start_minute = i - current_run + 2
 ```
 
+<!--v-->
+
 ## 常见错误
 
 1. 忘记 `-` 也会断开区间
@@ -332,21 +334,53 @@ start_minute = i - current_run + 2
 4. 把 0-based 下标直接当题目中的分钟数输出
 5. 没有先明确当前区间和历史最优区间分别记录什么
 
+## 错误代码 (17pt)
+
+<img src="images/t4_wa0x.png" width="55%" style="float: middle;">
+
+**这份代码错在哪里？**
+
+<!--v-->
+
+## 错误代码 (17pt)
+
+<img src="images/t4_wa0.png" width="55%" style="float: middle;">
+
+**少了一个等号就损失了三分！**
+
+<!--s-->
+
 <!--v-->
 
 ## 错误代码 (19pt)
 
-<img src="images/t4_wa1x.png" width="70%" style="float: middle;">
+<img src="images/t4_wa1x.png" width="55%" style="float: middle;">
 
-**这份代码的错误错在哪里？**
+**这份代码错在哪里？**
 
 <!--v-->
 
 ## 错误代码 (19pt)
 
-<img src="images/t4_wa1x.png" width="70%" style="float: middle;">
+<img src="images/t4_wa1.png" width="55%" style="float: middle;">
 
 **注意缩进！**
+
+<!--v-->
+
+## 错误代码 (16pt)
+
+<img src="images/t4_wa2x.png" width="55%" style="float: middle;">
+
+**这份代码错在哪里？**
+
+<!--v-->
+
+## 错误代码 (16pt)
+
+<img src="images/t4_wa2.png" width="55%" style="float: middle;">
+
+**情况相同，但是各自的代码却写的不一样。**
 
 <!--s-->
 
