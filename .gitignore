@@ -170,3 +170,6 @@ result
 .preview/
 
 .DS_Store
+
+# Recitation 4 terminal demonstration fixture
+!slides/Recitation4_Supplement/examples/run.log

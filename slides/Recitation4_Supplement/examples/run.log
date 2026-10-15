@@ -1,0 +1,4 @@
+INFO start
+INFO loading sample.in
+ERROR expected 12 but got 3
+INFO finished
