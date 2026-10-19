@@ -1,5 +1,5 @@
 ---
-title: SI100B-Fall-2026-Recitation-1
+title: SI100B_Fall_2026_Recitation_1
 separator: <!--s-->
 verticalSeparator: <!--v-->
 theme: simple
