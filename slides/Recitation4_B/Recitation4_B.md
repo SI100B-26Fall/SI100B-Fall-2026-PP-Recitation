@@ -1,5 +1,5 @@
 ---
-title: SI100B_Fall_2026_Recitation_4
+title: SI100B_Fall_2026_Recitation_4_B
 separator: <!--s-->
 verticalSeparator: <!--v-->
 theme: simple
@@ -7,7 +7,7 @@ highlightTheme: github
 css: assets/custom.css
 autoTitlePage: true
 makeTitle:
-    lecture: SI100B Fall 2026 Recitation 4
+    lecture: SI100B Fall 2026 Recitation 4 (B)
     title: Lecture 7–9 正课知识体系复习
     detail: SI100B 2026 Staff | 2026-10-16
 makeThanks: true
