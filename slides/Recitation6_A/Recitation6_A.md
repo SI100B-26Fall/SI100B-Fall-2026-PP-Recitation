@@ -1,0 +1,1614 @@
+---
+title: SI100B_Fall_2026_Recitation_6_A
+separator: <!--s-->
+verticalSeparator: <!--v-->
+theme: simple
+highlightTheme: github
+mermaid: false
+css: assets/custom.css
+autoTitlePage: true
+makeTitle:
+  lecture: SI100B Fall 2026 Recitation 6 (A)
+  title: Lec11 · Python 对象模型、继承与进阶 OOP
+  detail: SI100B 2026 Staff
+makeThanks: false
+---
+
+## 嵌套列表的反转结果
+
+输入：`[1, [2, 3], []]`
+
+<div class="three-line">
+
+| 操作 | 结果 |
+|:---|:---|
+| `L[::-1]` | `[[], [2, 3], 1]` |
+| `deep_rev(L)` | `[[], [3, 2], 1]` |
+
+</div>
+
+外层反转只重排当前元素，逐层反转还递归处理内部列表。
+
+Note:
+Lec11 第 43-46 页。输入为有限、无循环引用、仅含整数与列表的嵌套列表。上次的乘法、幂、阶乘和基础调用栈不再重讲。
+
+<!--v-->
+
+## deep_rev：逐层构造结果
+
+```python
+def deep_rev(L):
+    result = []
+    for e in L[::-1]:
+        if type(e) == list:
+            result.append(deep_rev(e))
+        else:
+            result.append(e)
+    return result
+```
+
+每层建立新列表，递归结果作为一个元素追加，保留层级。
+
+Note:
+Lec11 第 46 页。算法沿用教授版本，L2 改名为 result。示例暂时使用精确类型判断，后面解释 isinstance 对子类的处理。
+
+<!--v-->
+
+## 空列表与结果返回
+
+```python
+L = [1, [2, 3], []]
+print(deep_rev(L))  # [[], [3, 2], 1]
+print(deep_rev([])) # []
+print(L)           # [1, [2, 3], []]
+```
+
+空列表使循环执行 0 次，随后返回新建的 `[]`。
+
+递归进入有限结构中的子列表；子列表的长度不一定小于父列表。
+
+Note:
+解释终止情况通过循环自然实现。递归进展是进入子结构，而不是每次 len 一定减小。
+
+<!--v-->
+
+## count_elem：统计所有整数
+
+```python
+def count_elem(L):
+    total = 0
+    for e in L:
+        if type(e) == list:
+            total += count_elem(e)
+        else:
+            total += 1
+    return total
+```
+
+`[1, [], [2, [3, 4]]]` 得 `4`；`[[], [[]]]` 得 `0`。
+
+Note:
+Lec11 第 47 页。输入合同仅含 int 和 list，不含 bool 等其他类型。它统计整数叶子数量，不统计子列表本身。
+
+<!--s-->
+
+## OOP 核心概念汇总
+
+<div class="three-line">
+
+| 概念 | 含义 | 坐标示例 |
+|:---|:---|:---|
+| 类 class / 类型 type | 定义一类实例的行为 | `Coordinate` |
+| 对象 object | 具有身份、类型和值的实体 | `p` 指向的坐标对象 |
+| 实例 instance | 相对于某个类而言的具体对象 | `p = Coordinate(3, 4)` |
+| 属性 attribute | 通过点号访问的命名成员 | `p.x`、`p.move` |
+| 实例属性 | 由具体实例保存的数据 | `p.x`、`p.y` |
+| 类属性 | 由类保存、可供实例查找的成员 | `PointRecord.kind` |
+| 方法 method | 通过对象或类调用的行为 | `p.move(1, -2)` |
+| self | 普通实例方法接收的当前实例 | 调用中传入的 `p` |
+| 初始化方法 | 设置新实例的初始状态 | `__init__` |
+
+</div>
+
+
+Note:
+作为 OOP 部分的第一张表，先统一术语，再进入同一套坐标代码。对象是总称，实例描述对象与类的关系；类本身也是对象，后面的类型系统会展开。attribute 是总称，数据属性和方法都可以通过属性访问得到。PointRecord.kind 在后面的类属性示例中定义。__init__ 负责初始化，不等于分配对象。参考 Python 官方类教程与数据模型。
+
+<!--v-->
+
+## OOP 关系与进阶概念汇总
+
+<div class="three-line">
+
+| 概念 | 含义 | 本讲对应写法 |
+|:---|:---|:---|
+| 继承 inheritance | 子类复用、扩展基类行为 | `class Child(Base)` |
+| 重写 overriding | 子类重新定义继承的方法 | 子类定义 `describe` |
+| 多态 polymorphism | 同一调用可得到不同类型的实现 | `item.describe()` |
+| 组合 composition | 一个对象持有其他对象 | `group.points` |
+| property | 以属性读写形式执行方法逻辑 | `@property` |
+| 类方法 / 静态方法 | 分别绑定类 / 不自动绑定参数 | `@classmethod` / `@staticmethod` |
+| 特殊方法 | 接入运算符和内置操作 | `__add__`、`__len__` |
+| 抽象基类 / 数据类 | 规定接口 / 自动生成常用方法 | `ABC` / `@dataclass` |
+
+</div>
+
+这些扩展按需要采用，普通类无需全部实现。
+
+Note:
+这是后续机制的术语索引，先建立定位，不在此页展开语法。类属性与实例属性也不要求同时存在。super 和 MRO 会在继承部分详细讲解；它们分别负责继续方法查找与规定查找次序。装饰器是实现部分机制的语法工具，并非所有 OOP 类必须具备的组成部分。
+
+<!--v-->
+
+## 对象把状态与行为组织在一起
+
+**对象（object）**具有身份、类型和当前状态。
+
+**类（class）**定义一种对象的行为，实例保存具体状态。
+
+对坐标对象而言，`x`、`y` 是数据属性，`move` 是操作它们的方法。
+
+Python 的列表、字符串和整数也是对象，自定义类延续同一种对象模型。
+
+Note:
+Lec11 第 51-61 页。概念参考 Python 数据模型与 Harvard CS50P Lecture 8，使用坐标这一条主线，不列举额外场景。
+
+<!--v-->
+
+## 贯穿示例：Coordinate
+
+```python
+class Coordinate:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def move(self, dx, dy):
+        self.x += dx
+        self.y += dy
+
+    def as_tuple(self):
+        return self.x, self.y
+
+    def describe(self):
+        return f"({self.x}, {self.y})"
+```
+
+Note:
+在教授的初始化示例上补充三个普通实例方法。as_tuple 返回数据，describe 返回说明字符串，move 更新状态。此类在后续小节保持不变，扩展用不同子类名。
+
+<!--v-->
+
+## 实例化、属性与方法调用
+
+```python
+p = Coordinate(3, 4)
+origin = Coordinate(0, 0)
+print(p.x, p.y)           # 3 4
+print(p.as_tuple())       # (3, 4)
+print(origin.describe())  # (0, 0)
+```
+
+调用类创建实例；数据属性直接读取，方法通过括号调用。
+
+`p` 与 `origin` 是两个实例，分别保存坐标状态。
+
+Note:
+Lec11 第 65-68 页对应初始化和数据属性。直接给结果，不安排输出预测。
+
+<!--v-->
+
+## self 与实例方法调用
+
+```python
+p = Coordinate(3, 4)
+p.move(1, -2)
+print(p.as_tuple())  # (4, 2)
+Coordinate.move(p, -1, 2)
+print(p.as_tuple())  # (3, 4)
+```
+
+`p.move(1, -2)` 对应 `Coordinate.move(p, 1, -2)`。
+
+Python 自动把 `p` 放到第一个参数位置，方法体中的 `self` 就接收这个实例。
+
+Note:
+先只展示调用等价关系，避免同时引入绑定方法对象和特殊属性。普通实例方法定义中的 self 是接收实例的参数，调用 p.move 时 Python 自动提供该参数。这里针对本例的普通用户定义实例方法。参考 Python 类教程 Method Objects。
+
+<!--v-->
+
+## 绑定方法保存实例与函数
+
+```python
+p = Coordinate(3, 4)
+bound = p.move  # 取得方法，尚未调用
+print(bound.__self__ is p)  # True
+print(bound.__func__ is Coordinate.move)  # True
+bound(1, -2)
+print(p.as_tuple())  # (4, 2)
+```
+
+`bound` 是变量名；`__self__` 是方法对象的属性，保存已绑定的实例。
+
+调用 `bound(1, -2)` 时，Python 将它保存的 `p` 作为 `self` 传入。
+
+Note:
+绑定方法是把函数与接收实例组合起来的可调用对象。__self__ 和方法定义中的形参 self 处于不同位置：前者保存对象，后者在调用执行时接收该对象。__func__ 保存原函数。取 p.move 不执行 move；加括号才执行。__self__ 用来观察绑定，无需在日常调用中手动填写。bound 是任意普通变量名。参考 Python 数据模型 Instance methods：https://docs.python.org/3/reference/datamodel.html#instance-methods。
+
+<!--v-->
+
+## 更新状态与返回结果
+
+```python
+p = Coordinate(3, 4)
+result = p.move(1, -2)
+print(result)        # None
+print(p.as_tuple())  # (4, 2)
+print(p.describe())  # (4, 2)
+```
+
+`move` 改变实例，没有显式返回值；`as_tuple` 和 `describe` 返回计算结果。
+
+实例方法也遵循普通函数的返回规则。
+
+Note:
+区分对象状态和方法返回值，避免把 result 当作新坐标。不是所有实例方法都必须修改状态。
+
+<!--v-->
+
+## 初始化负责建立有效状态
+
+执行 `Coordinate(3, 4)` 时，新实例传给 `__init__` 的 `self`。
+
+<div class="three-line">
+
+| 内容 | 职责 |
+|:---|:---|
+| `__init__` | 为新实例设置初始状态，正常返回 `None` |
+| `self.x = x` | 将本次参数保存为实例属性 |
+| 普通方法 | 读取或更新已有实例 |
+
+</div>
+
+类可以不自行定义 `__init__`，但初始化参数必须符合实际采用的方法约定。
+
+Note:
+初始化不等于分配对象，__init__ 不得返回非 None 值。对象分配属于 __new__，本讲仅说明职责区分，不展开自定义分配。参考 Python 数据模型。
+
+<!--v-->
+
+## 实例属性与类属性
+
+```python
+class PointRecord:
+    kind = "point"
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+```
+
+`x`、`y` 保存在每个实例中；`kind` 保存在类中。
+
+实例可以访问从类中找到的普通属性。
+
+Note:
+本节只讲普通属性查找，不涉及 property 等数据描述符；后面补充描述符的优先级。避免把类属性当作每个实例独有的数据。
+
+<!--v-->
+
+## 普通属性的查找与遮蔽
+
+```python
+a = PointRecord(1, 2)
+b = PointRecord(3, 4)
+print(a.kind, b.kind)  # point point
+a.kind = "special"
+print(a.kind, b.kind)  # special point
+print(PointRecord.kind)  # point
+print(vars(a))  # {'x': 1, 'y': 2, 'kind': 'special'}
+```
+
+本例先查实例自身，再查类；`a.kind` 的赋值在实例中建立同名属性。
+
+Note:
+限定为本例普通属性，不能把这一顺序概括成包含 property 的全部规则。vars 通常查看实例 __dict__，并非所有类型都具备可更新的 __dict__。
+
+<!--v-->
+
+## 类属性中的列表由多个实例共享
+
+```python
+class SharedGroup:
+    points = []  # 执行类定义时创建一个列表
+
+first = SharedGroup()
+second = SharedGroup()
+first.points.append(Coordinate(1, 2))
+print(len(second.points))  # 1
+print(first.points is SharedGroup.points)  # True
+print(second.points is SharedGroup.points)  # True
+```
+
+两个实例都从类中找到同一个列表，`append` 修改这个共享对象。
+
+Note:
+本页的教学目标是理解状态的归属。points = [] 是在类定义执行时求值一次，不会在每次实例化时自动复制。first 和 second 均没有自己的 points 属性，因此它们都从 SharedGroup 查找到同一列表。first.points.append(...) 的属性查找先得到该列表，再原地修改列表，不会自动建立 first.points 实例属性。共享是类属性机制的正常结果，是否合适取决于数据应当由全类共享，还是每个实例独有。参考 Python 官方类教程 Class and Instance Variables。
+
+<!--v-->
+
+## 属性赋值与对象修改的区别
+
+<div class="three-line">
+
+| 操作 | 实际改变的内容 | 其他实例的结果 |
+|:---|:---|:---|
+| `a.kind = "special"` | 在 `a` 中建立实例属性 | `b.kind` 仍为 `"point"` |
+| `first.points.append(p)` | 修改类属性指向的共享列表 | `second` 也看到列表变化 |
+| `first.points = []` | 在 `first` 中绑定一个新列表 | `second` 仍访问原列表 |
+
+</div>
+
+属性赋值改变实例中保存的引用；`append` 改变引用指向的列表内容。
+
+字符串不能原地修改；`a.kind = "special"` 也不会改写原来的 `"point"`。
+
+Note:
+将前面的 PointRecord.kind 示例与 SharedGroup.points 示例并列说明。这张表分别描述三种操作的语义，不额外执行代码，也不重置前一页示例状态。关键区分是属性赋值与对象修改。不可变字符串无法原地修改，若操作产生新字符串再赋给实例属性，会建立或更新实例自己的绑定。可变列表既可原地修改，也可通过实例属性赋值换成新列表。类属性可供所有未遮蔽它的实例查找，类属性指向可变对象时才表现出共享修改效果。这里针对默认属性机制下的普通属性，后续 property setter 另行讨论。
+
+<!--v-->
+
+## 修改共享对象与重新绑定属性
+
+```python
+first.points = []  # 在 first 中保存一个新列表
+first.points.append(Coordinate(5, 6))
+print(len(first.points), len(second.points))  # 1 1
+print(first.points is SharedGroup.points)  # False
+print(second.points is SharedGroup.points)  # True
+print(first.points[0].as_tuple())   # (5, 6)
+print(second.points[0].as_tuple())  # (1, 2)
+```
+
+`first.points = []` 建立实例属性，遮蔽从类中查找的同名属性。
+
+`second` 继续访问原共享列表；`first` 此后访问自己的列表。
+
+Note:
+沿用上一页创建的 first、second。append 通过既有引用修改对象；赋值语句 first.points = [] 为本例普通实例设置属性，绑定到新对象。前者改变列表内容，后者改变 first 的属性指向。类属性仍存在，second 的查找不受该赋值影响。不要把 += 简化成这两种情况之一，它可能同时涉及原地操作和赋值，本页不引入。
+
+<!--v-->
+
+## 每个实例建立自己的容器
+
+```python
+class PointGroup:
+    def __init__(self):
+        self.points = []
+
+    def add(self, point):
+        self.points.append(point)
+
+first = PointGroup()
+second = PointGroup()
+first.add(Coordinate(1, 2))
+print(len(first.points), len(second.points))  # 1 0
+```
+
+每组需要独立坐标列表时，在 `__init__` 内为每个实例新建列表。
+
+Note:
+本页说明实例数据独立性的设计选择。self.points 在每次初始化时新建。PointGroup 保存 Coordinate 对象，后面用来衔接组合、继承与容器协议。
+
+<!--s-->
+
+## 内置类型与自定义类型
+
+```python
+values = [7, 2.5, "hi", [1, 2], {"x": 1}]
+print([type(v).__name__ for v in values])
+# ['int', 'float', 'str', 'list', 'dict']
+p = Coordinate(3, 4)
+print(type(p) is Coordinate)  # True
+```
+
+`type(obj)` 返回对象的类型；自定义类同样可以成为对象的类型。
+
+Note:
+Python 数据模型：对象具有类型，类型决定其支持的操作。此处 __name__ 只是为输出清楚的类型名，不作为命名规范专题。
+
+<!--v-->
+
+## 动态类型与名字绑定
+
+```python
+value = 3
+print(type(value).__name__)  # int
+value = "three"
+print(type(value).__name__)  # str
+```
+
+赋值让名字引用另一个对象；这里没有把原来的整数对象变成字符串。
+
+动态类型表示运行时根据对象处理操作，名字不固定绑定某一种类型。
+
+Note:
+只说明运行时类型模型，不重新展开上次的变量绑定与复制专题。不要把动态类型说成每个操作都允许任意类型。
+
+<!--v-->
+
+## 类本身也是对象
+
+```python
+p = Coordinate(3, 4)
+print(type(p) is Coordinate)  # True
+print(type(Coordinate) is type)  # True
+print(isinstance(Coordinate, type))  # True
+print(type(int) is type)  # True
+```
+
+实例的类型是它所属的类；本例中，类对象的类型是 `type`。
+
+`type` 是构造普通类对象的内置元类。
+
+Note:
+限定为本课由默认元类构造的类，不能断言所有类的 type 都恰好为 type；后面的 ABC 使用其派生元类。自定义元类不展开。
+
+<!--v-->
+
+## object 与 type 的不同角色
+
+```python
+print(Coordinate.__bases__ == (object,))  # True
+print(issubclass(Coordinate, object))     # True
+print(type(object) is type)              # True
+print(type(type) is type)                # True
+print(issubclass(type, object))           # True
+```
+
+`object` 是类继承体系的根基类，`type` 是内置的类对象类型。
+
+实例关系与继承关系是两种不同关系。
+
+`class Coordinate(object):` 显式指定基类；本例省略基类时默认继承 `object`。
+
+Note:
+解释之前 class Coordinate(object) 中 object 的角色：基类列表中的内置类对象。无显式基类时普通类默认继承 object。type 本身也是类，也继承 object。
+
+<!--v-->
+
+## 内置类型的继承关系
+
+<div class="three-line">
+
+| 类型 | 本例中的直接基类 |
+|:---|:---|
+| `bool` | `int` |
+| `int`、`float` | `object` |
+| `str`、`list`、`dict` | `object` |
+
+</div>
+
+```python
+print(issubclass(bool, int))   # True
+print(issubclass(float, int))  # False
+print(True + 2)               # 3
+```
+
+数值可以一起运算，不表示它们必然互为父类和子类。
+
+Note:
+不把数字抽象基类 numbers.Real 等协议层次混同为这些内置类的直接继承关系。bool 继承 int，但不能继续派生 bool。
+
+<!--v-->
+
+## 精确类型与继承关系判断
+
+```python
+print(type(True) is bool)      # True
+print(type(True) is int)       # False
+print(isinstance(True, int))   # True
+print(isinstance(3, object))   # True
+print(issubclass(bool, object)) # True
+```
+
+<div class="three-line">
+
+| 写法 | 判断内容 |
+|:---|:---|
+| `type(x) is T` | 精确类型是否为 `T` |
+| `isinstance(x, T)` | 实例是否属于 `T` 或其子类 |
+| `issubclass(S, T)` | 类 `S` 是否为 `T` 的子类 |
+
+</div>
+
+
+Note:
+本讲介绍常规继承关系；ABC 的虚拟子类与自定义类型检查钩子暂不展开。issubclass(T, T) 也为 True。参考内置函数文档。
+
+<!--v-->
+
+## isinstance 接纳列表子类
+
+```python
+class PointList(list):
+    pass
+
+data = PointList([1, 2])
+print(type(data) is list)       # False
+print(isinstance(data, list))   # True
+print(issubclass(PointList, list))  # True
+```
+
+允许子类型时使用 `isinstance`；精确限定类型时使用 `type(...) is ...`。
+
+若只接受普通整数，应明确排除 `bool`，或精确检查 `int`。
+
+Note:
+与正课 deep_rev 中 type(e) == list 衔接。后部 Notebook 给出用 isinstance 处理列表子类的完整扩展版本；不修改正课版本的输入合同。
+
+<!--v-->
+
+## 类型注解与运行时检查
+
+```python
+def twice(value: int) -> int:
+    return value * 2
+
+print(twice(3))     # 6
+print(twice("hi"))  # hihi
+```
+
+`value: int` 声明参数预期为整数；`-> int` 声明返回值预期为整数。
+
+Python 默认不强制检查这些注解，也不自动转换类型。字符串支持乘整数，所以第二次调用返回 `"hihi"`。
+
+Note:
+原例保留，用于区分声明与实际执行。参数注解、返回注解都不自动产生运行时验证。第二次调用违反声明的接口合同，静态检查器会诊断，但 Python 仍按对象实际支持的操作执行。来源：https://docs.python.org/3/library/typing.html。配套 examples/type_check_demo.py 保留相同代码，便于分别运行解释器与静态检查器。
+
+<!--v-->
+
+## 静态检查分析源代码中的类型约定
+
+将上一页代码保存为 `examples/type_check_demo.py`，使用 mypy 检查：
+
+```powershell
+python -m mypy examples/type_check_demo.py
+```
+
+对 `twice("hi")` 的诊断内容为：
+
+```text
+Argument 1 to "twice" has incompatible type "str";
+expected "int"  [arg-type]
+```
+
+mypy 分析代码而不执行函数。它报告类型不匹配，但不会让 Python 自动抛出异常。
+
+Note:
+静态检查可以在编辑器、终端或提交前运行，不必等到错误调用实际执行。mypy 是第三方工具，首次使用可执行 python -m pip install mypy。诊断在课件中分行显示，省略文件名与行号；实际输出通常位于同一行。即使静态检查报告错误，直接用 python examples/type_check_demo.py 运行仍输出 6 与 hihi。不要把静态类型错误说成 Python 运行时的 TypeError。来源：mypy 官方 Getting started 与 arg-type 诊断文档。
+
+<!--v-->
+
+## 显式检查在调用时拒绝不合法的值
+
+```python
+def twice_checked(value: int) -> int:
+    if not isinstance(value, int):
+        raise TypeError("value must be an int")
+    return value * 2
+
+print(twice_checked(3))  # 6
+try:
+    twice_checked("hi")
+except TypeError as error:
+    print(type(error).__name__, str(error))
+# TypeError value must be an int
+```
+
+`if` 检查实际参数，`raise` 抛出异常；注解本身不执行这两步。
+
+Note:
+显式检查指程序员把验证逻辑写进执行路径。非法输入在乘法前就被拒绝；示例捕获异常以展示结果，未捕获的异常会中断当前调用并向上传播。本例 isinstance 接受 int 及其子类，所以 bool 也会通过。只接收精确 int 时可用 type(value) is int，需由接口合同决定。返回类型注解同样不会自动检查返回对象。此例仅检查输入，不能据此宣称 Python 已自动验证函数全部合同。
+
+<!--v-->
+
+## 静态检查与显式运行时检查的对照
+
+<div class="three-line">
+
+| 比较内容 | 静态检查 | 显式运行时检查 |
+|:---|:---|:---|
+| 执行时机 | 主动运行工具或编辑器检查 | 调用执行到判断语句时 |
+| 执行主体 | mypy、Pyright 等工具 | Python 执行函数中的代码 |
+| 判断依据 | 类型注解与代码推断 | 实际值与写出的验证条件 |
+| 检查写法 | `value: int` 等注解 | `isinstance`、`if`、`raise` |
+| 不符合时 | 报告类型诊断 | 按代码抛出异常或处理输入 |
+| 对原例的结果 | 标记 `twice("hi")` 不匹配 | 没有显式判断时仍得 `hihi` |
+
+</div>
+
+静态检查帮助提前发现问题；显式检查在实际调用中落实输入约束。
+
+Note:
+两种检查可同时采用。静态检查并非自动执行，也不保证穷尽运行时错误；运行时检查仅验证实际执行到的条件。比较表使用原始 twice 与新增 twice_checked 区分“写了注解”与“实际执行验证”。来源：Python typing 文档与 mypy Getting started。
+
+<!--s-->
+
+## 继承规则汇总
+
+<div class="three-line">
+
+| 方面 | 规则与边界 |
+|:---|:---|
+| 继承方向 | 子类可使用基类成员，基类不自动获得子类新增成员 |
+| 方法继承 | 子类未重写时，沿 MRO 查找已有实现 |
+| 方法重写 | 子类提供同名实现，基类的原实现仍然存在 |
+| 初始化 | 未重写时可继承；重写后按需显式调用基类初始化 |
+| 实例状态 | 属性在具体实例上建立，继承不复制另一实例的数据 |
+| 类属性 | 子类可沿继承链查找，同名赋值可形成遮蔽 |
+| 类型关系 | 子类实例属于基类，基类实例不自动属于子类 |
+
+</div>
+
+下文使用同一个 Coordinate 定义，逐项展示这些规则。
+
+Note:
+继承汇总先给学习框架，再通过后续完整例子具体解释。基类实例不自动拥有子类独有成员，不等于“基类方法执行时绝不能调用子类重写的方法”：若 self 实际是子类实例，动态查找仍可选中子类实现。表中类属性的同名赋值指普通类/实例属性机制，property 等描述符后面另讲。来源：Python 官方类教程 Inheritance。
+
+<!--v-->
+
+## 继承复用已有类型的行为
+
+```python
+class PlainCoordinate(Coordinate):
+    pass
+
+plain = PlainCoordinate(3, 4)
+plain.move(1, -2)
+print(plain.as_tuple())  # (4, 2)
+print(isinstance(plain, Coordinate))  # True
+```
+
+子类没有重写初始化和方法时，沿继承链使用已有实现。
+
+Note:
+从已有 Coordinate 衔接继承。括号里的 Coordinate 是基类，PlainCoordinate 是派生类。pass 使类体合法，不是待补全内容。参考 Helsinki MOOC Class hierarchies。
+
+<!--v-->
+
+## 子类扩展状态并重写行为
+
+```python
+class NamedCoordinate(Coordinate):
+    def __init__(self, x, y, name="P"):
+        super().__init__(x, y)
+        self.name = name
+
+    def describe(self):
+        return f"{self.name}: {super().describe()}"
+```
+
+子类新增 `name`，复用坐标初始化，并提供自己的 `describe`。
+
+Note:
+完整子类，后续不再重定义。先说明继承与新增状态，再分别展开 super 和重写。describe 保持返回字符串的接口。默认 name 使基础坐标参数仍可使用。
+
+<!--v-->
+
+## 继承的方法与子类方法协同工作
+
+```python
+named = NamedCoordinate(3, 4, "A")
+print(named.describe())  # A: (3, 4)
+named.move(1, -2)
+print(named.describe())  # A: (4, 2)
+print(named.as_tuple())  # (4, 2)
+```
+
+`move` 和 `as_tuple` 来自基类，`describe` 使用子类版本。
+
+它们接收同一个实例，读取或修改同一组坐标属性。
+
+Note:
+子类不是在内部再创建一个父类对象。继承方法接收的 self 仍是 NamedCoordinate 实例。
+
+<!--v-->
+
+## 各类方法与属性的继承行为
+
+<div class="three-line">
+
+| 成员种类 | 子类使用时的行为 | 对应示例 |
+|:---|:---|:---|
+| 实例方法 | 绑定实际子类实例作为 `self` | `move`、`as_tuple` |
+| 初始化方法 | 可继承；重写后不自动追加基类初始化 | `__init__` |
+| 类方法 | 经子类访问时绑定子类作为 `cls` | `from_text` |
+| 静态方法 | 沿继承链取得函数，不自动绑定首参 | `is_pair` |
+| property | 继承 getter、setter 等属性访问逻辑 | `radius`、`x` |
+| 特殊方法 | 继承相应的运算或内置操作协议 | `__add__`、`__len__` |
+| 抽象方法 | 未完成的抽象要求继续保留，完成后可实例化 | 抽象接口 `move` |
+
+</div>
+
+子类可以重写这些成员；后续小节给出类方法、property 和协议的完整代码。
+
+Note:
+按成员种类汇总继承，而不是把继承只等同于普通函数复用。普通方法的 self 仍为实际子类实例，类方法的 cls 取决于访问该方法的实际类，静态方法不添加隐含实参。property 描述符可以继承，其 getter/setter 对当前实例工作。特殊方法通常由操作在类型层次中查找，不能把给单个实例赋同名属性视为重写内置操作。所有示例名称会在本讲后续出现，不要求在此页提前运行尚未定义的类。来源：内置函数文档、Descriptor Guide 与 Python 数据模型。
+
+<!--v-->
+
+## super 复用同一个实例上的基类实现
+
+```python
+named = NamedCoordinate(3, 4, "A")
+print(vars(named))  # {'x': 3, 'y': 4, 'name': 'A'}
+print(type(named) is NamedCoordinate)  # True
+print(super(NamedCoordinate, named).describe())
+# (3, 4)
+```
+
+`super()` 返回查找代理，不会额外创建一个父类实例。
+
+在当前单继承例子中，它找到 `Coordinate` 的相应方法。
+
+Note:
+零参数 super() 在方法中结合定义所在类及 self 工作。此处显式两参数便于在类外观察。多继承时 super 可能继续到兄弟类，后面用 MRO 解释。参考内置函数 super 文档。
+
+<!--v-->
+
+## 子类中的方法调用写法
+
+<div class="three-line">
+
+| 方法体中的写法 | 查找与调用的含义 |
+|:---|:---|
+| `self.move(1, -2)` | 从实际对象查找方法，可使用子类重写版本 |
+| `super().describe()` | 从当前类之后沿实际 MRO 继续查找 |
+| `Coordinate.describe(self)` | 直接选用指定基类的实现，实例仍是 `self` |
+| `super().__init__(x, y)` | 在当前实例上执行查找到的初始化方法 |
+
+</div>
+
+在单继承例子中，`super()` 通常找到直接基类的方法。
+
+多继承时，显式指定基类可能跳过其他协作层；后文用 MRO 展示差异。
+
+Note:
+这张表补全“使用继承方法”的不同方式。前两行通过对象或 super 的动态查找工作；直接写基类名选定的是该函数本身。显式基类调用仍把现有 self 传入，不创建父对象。super 不保证固定等于直接父类，协作式多继承要让参与类共同遵守一致的调用约定。来源：super 官方内置函数文档及类教程。
+
+<!--v-->
+
+## 重写初始化时显式完成初始化链
+
+```python
+class IncompleteCoordinate(Coordinate):
+    def __init__(self, name):
+        self.name = name
+
+incomplete = IncompleteCoordinate("A")
+try:
+    incomplete.as_tuple()
+except AttributeError:
+    print("x and y are not initialized")
+```
+
+子类定义自己的 `__init__` 后，基类初始化不会自动再执行一次。
+
+Note:
+说明缺少 super 初始化的真实后果，不留挖空或让学生猜输出。实例化完成，读取缺失坐标时才报错。不要说子类一定必须调用 super；本例需要它完成基类所需状态，子类也可自行正确完成初始化。
+
+<!--v-->
+
+## 方法重写与动态分派
+
+```python
+def describe_all(points):
+    return [point.describe() for point in points]
+
+items = [Coordinate(1, 2), NamedCoordinate(3, 4, "B")]
+print(describe_all(items))
+# ['(1, 2)', 'B: (3, 4)']
+```
+
+相同的调用表达式 `point.describe()`，根据实际对象找到相应实现。
+
+方法选择取决于对象的实际类型，而不是变量名 `point`。
+
+Note:
+动态分派不依据变量名或外观上写的注解来选择方法。参考 Python 类教程，派生类可重写基类方法。
+
+<!--v-->
+
+## 子类型保持调用约定
+
+<div class="three-line">
+
+| 方法 | 基类与子类共同遵守的约定 |
+|:---|:---|
+| `move(dx, dy)` | 接收偏移量并更新坐标 |
+| `as_tuple()` | 返回包含两个坐标值的元组 |
+| `describe()` | 返回描述当前对象的字符串 |
+
+</div>
+
+重写可以扩展行为，但调用方仍应能按原接口使用对象。
+
+`NamedCoordinate.describe()` 保留返回类型，并增加名称信息。
+
+Note:
+以本例说明可替换性的设计要求。Python 不会自动验证重写的全部参数、返回值和业务语义；方法同名不等于满足设计合同。
+
+<!--v-->
+
+## 父子类成员与类型关系
+
+```python
+parent_point = Coordinate(1, 2)
+child_point = NamedCoordinate(3, 4, "A")
+print(child_point.as_tuple())  # (3, 4)，继承的方法
+print(child_point.name)        # A，子类新增属性
+print(hasattr(parent_point, "name"))  # False
+print(isinstance(child_point, Coordinate))  # True
+print(isinstance(parent_point, NamedCoordinate))  # False
+print(issubclass(NamedCoordinate, Coordinate))    # True
+print(issubclass(Coordinate, NamedCoordinate))    # False
+```
+
+子类实例具有基类行为；单独创建的基类实例不自动获得子类的 `name`。
+
+Note:
+明确用代码区分基类实例和子类实例。child_point 从基类得到 as_tuple，name 由子类初始化建立；parent_point 没有运行子类初始化，因此没有该属性。继承关系不可反向推断。普通 Python 实例也可在后续显式赋值新属性，但这种动态扩展不表示基类自动继承了子类能力。本例子类的精确类型仍为 NamedCoordinate，精确类型与 isinstance 的区分已在类型系统小节讲过。
+
+<!--v-->
+
+## 鸭子类型依赖对象提供的行为
+
+```python
+class ForeignCoordinate:
+    def describe(self):
+        return "external coordinate"
+
+print(describe_all([ForeignCoordinate()]))
+# ['external coordinate']
+print(isinstance(ForeignCoordinate(), Coordinate))
+# False
+```
+
+`describe_all` 只依赖 `describe()`，不强制要求某个共同父类。
+
+Note:
+鸭子类型用于说明行为接口与显式继承不等价。这里只需 describe，不能因此把 ForeignCoordinate 当成支持 move 或 as_tuple 的对象。
+
+<!--v-->
+
+## 组合把对象保存在另一个对象中
+
+```python
+group = PointGroup()
+group.add(Coordinate(1, 2))
+group.add(NamedCoordinate(3, 4, "A"))
+print([p.describe() for p in group.points])
+# ['(1, 2)', 'A: (3, 4)']
+group.points[0].move(1, 0)
+print(group.points[0].as_tuple())  # (2, 2)
+print(isinstance(group, Coordinate))  # False
+```
+
+`PointGroup` 包含坐标对象；`NamedCoordinate` 则是一种坐标对象。
+
+Note:
+用同一组代码区分 has-a 与 is-a，而非列举其他应用场景。容器保存对象引用，对其中对象的操作会更新该对象。
+
+<!--s-->
+
+## 继承结构与方法查找
+
+<div class="three-line">
+
+| 结构 | 类之间的关系 | 方法查找特点 |
+|:---|:---|:---|
+| 单继承 | 一个直接基类 | 沿继承链寻找实现 |
+| 多层继承 | 子类的基类还有基类 | 可使用祖先类的成员 |
+| 多重继承 | 一个类有多个直接基类 | 同名方法由实际 MRO 决定 |
+| 菱形继承 | 多个分支共享一个祖先类 | C3 让共同祖先在 MRO 中只出现一次 |
+
+</div>
+
+MRO 是 Python 为类确定的查找次序，可通过 `类.__mro__` 查看。
+
+基类书写顺序参与决定 MRO，不能把所有继承图简单当成深度优先搜索。
+
+Note:
+将继承的各种结构列在同一表格。多层继承和菱形继承是常见结构称呼，不是额外语法关键字。继承声明若无法形成一致的 C3 次序，会在创建类时报错。下文保留原来单继承、菱形与协作式 super 的全部代码。来源：官方 MRO HOWTO。
+
+<!--v-->
+
+## 单继承的 MRO
+
+```python
+print([cls.__name__ for cls in NamedCoordinate.__mro__])
+# ['NamedCoordinate', 'Coordinate', 'object']
+```
+
+**MRO（Method Resolution Order）**给出类及其基类的查找次序。
+
+对本例的普通方法，先找到子类实现，再沿 MRO 继续查找。
+
+`super()` 从当前类之后的位置继续。
+
+Note:
+不把全部属性查找简化为只有 MRO，实例属性和描述符还有相应优先级。本页讲类层次中的普通方法选择。参考官方 MRO HOWTO。
+
+<!--v-->
+
+## 协作式多重继承的基类
+
+```python
+class TraceRoot:
+    def steps(self):
+        return ["root"]
+
+class LeftTrace(TraceRoot):
+    def steps(self):
+        return ["left"] + super().steps()
+
+class RightTrace(TraceRoot):
+    def steps(self):
+        return ["right"] + super().steps()
+```
+
+Note:
+最小独立例子专门观察查找顺序，不增加其他 OOP 使用场景。相同方法签名，各层通过 super 协作，根方法负责结束。
+
+<!--v-->
+
+## 菱形继承的查找次序
+
+```python
+class CombinedTrace(LeftTrace, RightTrace):
+    pass
+
+combined = CombinedTrace()
+print([cls.__name__ for cls in CombinedTrace.__mro__])
+# ['CombinedTrace', 'LeftTrace', 'RightTrace',
+#  'TraceRoot', 'object']
+print(combined.steps())  # ['left', 'right', 'root']
+```
+
+Python 用 C3 线性化确定 MRO，此例共同基类只出现一次。
+
+Note:
+画在纸上时可说明左右两支共同继承 TraceRoot。课件用可编辑列表直接给出准确次序，不要求学生手算 C3 合并算法。
+
+<!--v-->
+
+## super 可以继续到兄弟类
+
+```python
+print(super(LeftTrace, combined).steps())
+# ['right', 'root']
+print(TraceRoot.steps(combined))
+# ['root']
+```
+
+在 `CombinedTrace` 的 MRO 中，`LeftTrace` 之后是 `RightTrace`。
+
+因此 `super()` 不是固定指向源代码中写出的直接父类。
+
+Note:
+这是 super 最关键的进阶语义。显式调用 TraceRoot.steps 直接跳到指定实现，不等价于合作式 super 查找。
+
+<!--v-->
+
+## 协作式方法调用的约定
+
+<div class="three-line">
+
+| 组成 | 本例中的约定 |
+|:---|:---|
+| 方法签名 | 各层都接收 `self`，无额外参数 |
+| 继续调用 | 每个协作层调用一次 `super().steps()` |
+| 结束位置 | `TraceRoot.steps` 返回最终列表 |
+| 搜索顺序 | 由实际对象类型的 MRO 决定 |
+
+</div>
+
+复杂多继承需要各参与类共同遵守调用约定。
+
+Note:
+同名方法不自动保证可协作。更复杂初始化可能用一致签名或关键字传参协议，此处不展开参数转发技巧。不要把 C3 简化成一律深度优先或仅按书写顺序遍历整个图。
+
+<!--s-->
+
+## property 提供计算型属性
+
+```python
+class RadialCoordinate(Coordinate):
+    @property
+    def radius(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+
+radial = RadialCoordinate(3, 4)
+print(radial.radius)  # 5.0
+radial.move(-3, 0)
+print(radial.radius)  # 4.0
+```
+
+`radial.radius` 会自动执行上面的 `radius(self)`，计算并返回当前半径。
+
+getter 指读取属性时执行的函数；这里使用 `radial.radius`，不加 `()`。
+
+Note:
+将“调用方”直接说成使用对象的代码：读取 radial.radius 触发 getter，self 是 radial。@property 下原来编写的 radius 函数就是 getter。radius 不另外缓存，而是根据当前 x、y 计算。@property 将方法包装为属性描述符，读取时不加括号。装饰器的通用实现原理不在此展开。参考内置 property 与 Descriptor Guide。
+
+<!--v-->
+
+## setter 在赋值时维护约束
+
+```python
+class NonnegativeXCoordinate(Coordinate):
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        if value < 0:
+            raise ValueError("x must be nonnegative")
+        self._x = value
+```
+
+继承来的初始化对 `self.x` 赋值时，也会执行这个 setter。
+
+Note:
+本例仅约束 x 非负，y 可以为负。数值参数是输入约定，类型验证不在此展开。_x 是内部存储，x 是公开接口；不能在 setter 内再次写 self.x = value，否则递归触发自身。
+
+<!--v-->
+
+## 公开属性 x 与内部存储 _x
+
+<div class="three-line">
+
+| 使用方式 | 实际执行的操作 |
+|:---|:---|
+| `obj.x` | getter 返回 `self._x` 中保存的值 |
+| `obj.x = 5` | setter 验证数值，再执行 `self._x = 5` |
+| `obj._x` | 直接读取普通实例属性中的值 |
+| `obj._x = -1` | 直接改变存储，绕过 `x` 的 setter 检查 |
+
+</div>
+
+`_x` 是普通属性，单下划线表示内部使用约定。`x` 与 `_x` 的关联由 getter、setter 中的代码建立。
+
+setter 内若写 `self.x = value`，会反复触发自身，最终产生 `RecursionError`。
+
+Note:
+x 是 property 提供的公开访问接口，_x 是本例选择的实际存储属性。单下划线不构成强制访问限制，因此直接操作 obj._x 会绕过验证。Python 不根据名字自动把 x 和 _x 配对；可换成其他存储名，只要 getter/setter 相应调整。getter 的 self._x 读取普通数据，不会再次读取 property x；setter 的 self._x 赋值同样不会再次触发 x。若 setter 再给 self.x 赋值，默认机制会再次执行该 setter，产生无穷递归直到递归深度限制。基类 Coordinate.__init__ 中的 self.x = x 会先触发子类 setter，随后由 setter 建立 _x。来源：Python 内置 property 文档及 Descriptor Guide。
+
+<!--v-->
+
+## 属性赋值的完整执行结果
+
+```python
+checked = NonnegativeXCoordinate(3, 4)
+checked.x = 5
+print(checked.x)  # 5
+try:
+    checked.x = -1
+except ValueError:
+    print("negative x rejected")
+print(checked.x)  # 5
+print(vars(checked))  # {'_x': 5, 'y': 4}
+```
+
+失败的赋值未更新 `_x`，实例仍保留合法的 x 值。
+
+Note:
+直接显示完整结果，不设置纠错题。还应验证 NonnegativeXCoordinate(-1, 0) 会在初始化中拒绝非法值。类中的公开属性不会因下划线约定而自动获得安全隔离。
+
+<!--v-->
+
+## 普通属性与 property 的查找差异
+
+```python
+checked.__dict__["x"] = -100
+print(checked.x)  # 5
+try:
+    radial.radius = 9
+except AttributeError:
+    print("radius is read-only")
+```
+
+在默认实例查找中，找到的 `property` 数据描述符优先于同名实例字典项。
+
+没有 setter 的 property 通过公开接口只读，内部状态仍可由其他方法改变。
+
+Note:
+在本例同名 property 未被子类普通类属性遮蔽的前提下说明默认查找。不要把前面“先实例后类”的普通属性规则推广到描述符。直接修改 __dict__ 仅用于观察机制，不是推荐的业务用法。
+
+<!--v-->
+
+## 类方法与静态方法的定义
+
+```python
+class ParsedCoordinate(Coordinate):
+    @classmethod
+    def from_text(cls, text):
+        x, y = text.split(",")
+        return cls(float(x), float(y))
+
+    @staticmethod
+    def is_pair(value):
+        return isinstance(value, (tuple, list)) and len(value) == 2
+```
+
+`classmethod` 接收类，`staticmethod` 不自动接收实例或类。
+
+Note:
+from_text 是替代构造入口，输入约定为两个逗号分隔的有效数字。is_pair 只检查容器种类与长度，不验证元素一定是数值。参考内置函数 classmethod 与 staticmethod。
+
+<!--v-->
+
+## cls 保留实际调用的子类
+
+```python
+class DerivedParsedCoordinate(ParsedCoordinate):
+    pass
+
+parsed = DerivedParsedCoordinate.from_text("3,4")
+print(type(parsed).__name__)  # DerivedParsedCoordinate
+print(parsed.as_tuple())     # (3.0, 4.0)
+print(ParsedCoordinate.is_pair((3, 4)))  # True
+print(parsed.is_pair([1]))              # False
+```
+
+`from_text` 中的 `cls` 是实际调用的类，`cls(...)` 创建该类型的实例。
+
+Note:
+本例子类继承了兼容的初始化参数。如果子类改成不兼容的构造签名，需要调整替代构造方法，不能承诺任意子类都直接可用。静态方法通过类或实例访问都不额外绑定 self。
+
+<!--v-->
+
+## 三种方法的绑定内容
+
+<div class="three-line">
+
+| 方法种类 | 自动接收的首参 | 本讲示例 |
+|:---|:---|:---|
+| 普通实例方法 | 实例 `self` | `p.move(1, 2)` |
+| 类方法 | 实际类 `cls` | `ParsedCoordinate.from_text("3,4")` |
+| 静态方法 | 无 | `ParsedCoordinate.is_pair((3, 4))` |
+
+</div>
+
+实例方法处理对象状态，类方法可以构造对象，静态方法组织相关辅助计算。
+
+这三种方法的区别在于调用时自动绑定的内容。
+
+Note:
+比较真实语义，不做变量命名规范说明。类方法也可以经实例调用，绑定的是实际类型而不是该实例本身。
+
+<!--s-->
+
+## 特殊方法接入 Python 的操作协议
+
+<div class="three-line">
+
+| 常用操作 | 类型可实现的特殊方法 |
+|:---|:---|
+| `str(p)`、`print(p)` | `__str__` |
+| `repr(p)`、容器中的表示 | `__repr__` |
+| `a + b` | `__add__`，必要时考虑反向方法 |
+| `a == b` | `__eq__` |
+| `len(path)`、迭代、索引 | `__len__`、`__iter__`、`__getitem__` |
+
+</div>
+
+这些方法让自定义对象与内置操作配合使用。
+
+Note:
+特殊方法由类型按协议提供。对隐式操作而言通常从类型上查找，不能把它简单等同于所有情况下直接从实例字典取同名函数。参考 Python 数据模型 Special method names。
+
+<!--v-->
+
+## 自定义 str 与 repr
+
+```python
+class PrintableCoordinate(Coordinate):
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+    def __repr__(self):
+        return f"PrintableCoordinate({self.x!r}, {self.y!r})"
+```
+
+`__str__` 面向可读展示，`__repr__` 面向明确的对象表示。
+
+两者都必须返回字符串。
+
+Note:
+!r 在 f-string 中使用 repr 表示字段。不是所有 repr 都保证可直接 eval 重建对象，不鼓励执行任意 repr 字符串。
+
+<!--v-->
+
+## 打印对象与打印对象容器
+
+```python
+display_point = PrintableCoordinate(3, 4)
+print(display_point)       # (3, 4)
+print(repr(display_point)) # PrintableCoordinate(3, 4)
+print([display_point])     # [PrintableCoordinate(3, 4)]
+```
+
+列表展示内部元素时使用元素的 `repr` 表示。
+
+未实现 `__str__` 时，默认展示可以回退到 `__repr__`。
+
+Note:
+输出不依赖随机内存地址，适合课堂直接复现。使用不同的子类名保持前面 canonical Coordinate 不变。
+
+<!--v-->
+
+## 运算符重载：向量相加
+
+```python
+class Vector(Coordinate):
+    def __add__(self, other):
+        if not isinstance(other, Vector):
+            return NotImplemented
+        return Vector(self.x + other.x, self.y + other.y)
+
+v = Vector(1, 2) + Vector(3, 4)
+print(v.as_tuple())  # (4, 6)
+```
+
+`+` 构造并返回新向量，两个输入向量保持原值。
+
+Note:
+本例返回 Vector，不承诺自动保留任意更复杂子类的全部字段。非 Vector 的参数返回 NotImplemented，让 Python 按运算协议继续处理。
+
+<!--v-->
+
+## NotImplemented 是协议返回值
+
+```python
+v = Vector(1, 2)
+print(Vector.__add__(v, 3) is NotImplemented)  # True
+try:
+    v + 3
+except TypeError:
+    print("unsupported addition")
+```
+
+返回 `NotImplemented` 让 Python 尝试协议中的其他实现。
+
+双方都不支持时，最终得到 `TypeError`。
+
+`NotImplemented` 是特殊返回值，`NotImplementedError` 是异常。
+
+Note:
+后面抽象方法示例使用 NotImplementedError，两者必须区分。加法协议还涉及 __radd__ 与子类型优先，本讲不展开全部分派细节，但不能说失败仅由 __add__ 一步决定。
+
+<!--v-->
+
+## 值相等与对象身份
+
+```python
+class ValueCoordinate(Coordinate):
+    def __eq__(self, other):
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.as_tuple() == other.as_tuple()
+```
+
+本例只比较相同精确类型的坐标值。
+
+`==` 使用相等协议，`is` 判断是否引用同一个对象。
+
+Note:
+限定相同精确类型是一种有意的比较策略。不是所有类都必须这样比较，也不能断言 isinstance 是所有相等实现的正确选择。此处两个坐标值就是本类全部参与相等的状态。
+
+<!--v-->
+
+## 相等协议与哈希约束
+
+```python
+a = ValueCoordinate(1, 2)
+b = ValueCoordinate(1, 2)
+print(a == b, a is b)  # True False
+print(ValueCoordinate.__hash__ is None)  # True
+try:
+    hash(a)
+except TypeError:
+    print("unhashable value coordinate")
+```
+
+本例定义值相等后默认不可哈希，避免把可变坐标直接当作稳定的键。
+
+Note:
+不要概括为所有可变对象都不可哈希。普通自定义对象若保留身份相等可有默认身份哈希；这里讲 __eq__ 与默认 __hash__ 的联动，不重复上次字典哈希原理。
+
+<!--v-->
+
+## 为组合容器实现内置协议
+
+```python
+class Path(PointGroup):
+    def __len__(self):
+        return len(self.points)
+
+    def __iter__(self):
+        return iter(self.points)
+
+    def __getitem__(self, index):
+        return self.points[index]
+```
+
+`Path` 继承容器初始化与 `add`，再接入长度、迭代与索引操作。
+
+Note:
+PointGroup 是组合坐标的容器，Path 是 PointGroup 的子类。__iter__ 返回迭代器而不是列表本身。__len__ 按协议返回非负整数。
+
+<!--v-->
+
+## 长度、迭代、索引与真假值
+
+```python
+path = Path()
+print(bool(path))  # False
+path.add(Coordinate(1, 2))
+path.add(NamedCoordinate(3, 4, "A"))
+print(len(path))  # 2
+print([p.as_tuple() for p in path])  # [(1, 2), (3, 4)]
+print(path[0].as_tuple())  # (1, 2)
+print(bool(path))  # True
+```
+
+未定义 `__bool__` 时，真假值判断可通过 `__len__` 完成。
+
+Note:
+本例索引把参数转交给内置列表，因此也保留负索引及切片行为；切片结果是普通列表，不是 Path。组合与继承在同一个例子中协同使用。
+
+<!--s-->
+
+## 抽象基类显式规定行为接口
+
+```python
+from abc import ABC, abstractmethod
+
+class Movable(ABC):
+    @abstractmethod
+    def move(self, dx, dy):
+        raise NotImplementedError
+```
+
+继承方需要提供具体的 `move` 实现，才能完成这种抽象接口的实例化要求。
+
+`abstractmethod` 表达接口要求；这里的异常用于尚无具体实现的方法体。
+
+Note:
+抽象方法本身也可以具有实现。不能把抽象等同于方法体必须为空。本例通过 ABC 及装饰器声明，不展开自定义元类或虚拟子类注册。参考 abc 官方文档。
+
+<!--v-->
+
+## 未完成抽象接口的类不可实例化
+
+```python
+class IncompleteMovable(Movable):
+    pass
+
+try:
+    IncompleteMovable()
+except TypeError:
+    print("abstract method is not implemented")
+print(type(Movable).__name__)  # ABCMeta
+```
+
+类定义可以完成，但缺少抽象方法的具体实现时不能创建其实例。
+
+Note:
+补充前面类对象类型：采用 ABCMeta 的类不必恰好以 type 为精确类型，ABCMeta 是 type 的子类。抽象机制不自动验证实现的全部签名与业务语义。
+
+<!--v-->
+
+## 通过继承满足抽象接口
+
+```python
+class MovableCoordinate(Coordinate, Movable):
+    pass
+
+movable = MovableCoordinate(3, 4)
+movable.move(1, -2)
+print(movable.as_tuple())  # (4, 2)
+print(isinstance(movable, Movable))  # True
+```
+
+MRO 中 `Coordinate.move` 已提供具体实现，因而这个子类可以实例化。
+
+抽象接口、实现复用和实际调用在同一个类中衔接。
+
+Note:
+Coordinate 的元类是 type，Movable 的元类是 ABCMeta，后者兼容前者，因此此例多继承合法。无需讲自定义元类选择算法。
+
+<!--v-->
+
+## dataclass 自动生成常用方法
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class DataCoordinate:
+    x: float
+    y: float
+
+    def move(self, dx, dy):
+        self.x += dx
+        self.y += dy
+```
+
+默认按字段生成初始化、对象表示和相等比较等方法，业务方法仍可自己定义。
+
+Note:
+dataclass 是类装饰器，使用字段注解描述数据。它不代表所有类都应变成数据类，也不会自动加入业务上的移动规则。参考 dataclasses 官方文档。
+
+<!--v-->
+
+## 数据类的初始化、表示与相等
+
+```python
+data_point = DataCoordinate(3, 4)
+print(data_point)  # DataCoordinate(x=3, y=4)
+print(data_point == DataCoordinate(3, 4))  # True
+data_point.move(1, -2)
+print(data_point)  # DataCoordinate(x=4, y=2)
+print(type(data_point.x).__name__)  # int
+```
+
+字段注解不会自动把实参转换成 `float`。
+
+默认生成的相等比较要求双方精确类型一致，再比较字段值。
+
+Note:
+本例字段实际接收 int，因此表示为整数，避免误讲自动类型转换。普通 dataclass 默认可变，定义相等后通常默认不可哈希；不要承诺自动生成排序操作。
+
+<!--v-->
+
+## default_factory 建立独立可变字段
+
+```python
+from dataclasses import field
+
+@dataclass
+class DataPath:
+    points: list = field(default_factory=list)
+
+data_first = DataPath()
+data_second = DataPath()
+data_first.points.append(DataCoordinate(1, 2))
+print(len(data_first.points), len(data_second.points))  # 1 0
+```
+
+工厂在每次初始化需要默认值时调用，避免实例共用同一个默认列表。
+
+Note:
+与前面的可变类属性问题衔接。不是复习复制，而是解释 dataclass 字段默认值的正确用法。Python 3.11 起检查不可哈希默认值，具体报错版本细节不作为本讲重点。
+
+<!--v-->
+
+## frozen 数据类限制字段重新赋值
+
+```python
+from dataclasses import FrozenInstanceError
+
+@dataclass(frozen=True)
+class FrozenCoordinate:
+    x: float
+    y: float
+
+fixed = FrozenCoordinate(3, 4)
+try:
+    fixed.x = 8
+except FrozenInstanceError:
+    print("field assignment is blocked")
+```
+
+`frozen` 限制通常的字段赋值，不等于所有内部对象都深度不可变。
+
+Note:
+本例字段保存数值，适合值对象。若字段是列表，仍可修改列表内容；frozen 不是安全隔离机制。默认 eq 与 frozen 的组合可生成适当哈希，但字段本身仍需可哈希才能实际哈希。
+
+<!--v-->
+
+## 把类型、继承与协议串联使用
+
+```python
+route = Path()
+route.add(Coordinate(1, 2))
+route.add(NamedCoordinate(3, 4, "A"))
+for point in route:
+    point.move(1, 0)
+print([p.describe() for p in route])
+# ['(2, 2)', 'A: (4, 4)']
+print(isinstance(route, PointGroup))  # True
+print(isinstance(route, Coordinate))  # False
+```
+
+容器通过组合保存对象，继承容器行为，通过迭代协议接入 `for`。
+
+Note:
+完整串联同一条坐标主线，不新增其他应用场景。循环中 move 采用实例方法绑定，describe 通过动态分派保留子类行为。
+
+<!--v-->
+
+## 对象关系的四个层次
+
+<div class="three-line">
+
+| 关系 | 本讲示例 |
+|:---|:---|
+| 对象属于某种类型 | `type(p) is Coordinate` |
+| 类本身也是对象 | `isinstance(Coordinate, type)` |
+| 子类继承已有类型 | `issubclass(NamedCoordinate, Coordinate)` |
+| 对象内部包含其他对象 | `route.points` 保存坐标实例 |
+
+</div>
+
+方法绑定决定操作哪个实例，MRO 决定查找哪份类实现。
+
+特殊方法让自定义类型参与 Python 的内置操作。
+
+Note:
+总结关系，不把这些表达式当作都针对最后同一个 p 的断言。核心区别是实例关系、类型对象、继承关系与组合关系，不重复命名规范。
+
+<!--v-->
+
+## 详细用法与扩展顺序
+
+1. 用初始化和实例方法组织对象状态与操作。
+2. 区分类属性和实例属性，理解普通查找与属性描述符。
+3. 用继承复用接口与实现，用重写提供子类行为。
+4. 用 MRO 和 `super()` 理解协作式方法调用。
+5. 用特殊方法接入协议，用抽象类或数据类表达额外约定。
+
+配套 Notebook 按同样顺序提供完整代码、输出和边界验证。
+
+Note:
+本讲按知识依赖组织，不规定课堂时长。元类自定义、完整描述符开发、全部算术反向协议、__slots__ 等属于后续可继续展开的主题，本次不混入以保持主线清楚。
+
+<!--s-->
+
+## 参考：对象、类型与继承
+
+- 正课：教授 `Lec11_A.pdf`，第 42-68 页。
+- [Python 官方类教程](https://docs.python.org/3/tutorial/classes.html)：属性、绑定方法、继承与重写。
+- [Python 数据模型](https://docs.python.org/3/reference/datamodel.html)：对象、类型及特殊方法。
+- [内置函数文档](https://docs.python.org/3/library/functions.html)：`type`、`isinstance`、`super`。
+- [Helsinki MOOC · Class hierarchies](https://programming-26.mooc.fi/part-10/1-class-hierarchies/)：继承教学顺序。
+- [Python MRO HOWTO](https://docs.python.org/3/howto/mro.html)：C3 方法查找顺序。
+
+Note:
+资料于 2026-10-28 核对。代码为本讲沿坐标例子编写。MRO HOWTO 标题保留历史版本号，其说明的 C3 顺序仍用于 Python 3。
+
+<!--v-->
+
+## 参考：进阶对象机制
+
+- [Descriptor Guide](https://docs.python.org/3/howto/descriptor.html)：属性查找、方法绑定和 property。
+- [abc 官方文档](https://docs.python.org/3/library/abc.html)：抽象基类与抽象方法。
+- [dataclasses 官方文档](https://docs.python.org/3/library/dataclasses.html)：字段、生成方法、默认工厂和 frozen。
+- [typing 官方文档](https://docs.python.org/3/library/typing.html)：类型注解与运行时的边界。
+- [Harvard CS50P · Lecture 8](https://cs50.harvard.edu/python/notes/8/)：完整示例、继承和特殊方法的教学参考。
+
+Note:
+来源用于校核语言语义和教学组织；不照搬全部外部例子，不把版本特有的新特性当作基础依赖。所有代码仅依赖 Python 标准库。
+
+<!--s-->
+
+# Thanks for Listening
+
+
+
+Note:
+结束页。
